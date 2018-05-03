@@ -1,19 +1,19 @@
 
-	6.  ¹ö¶¯¿Ø¼şRecyclerView
-  AndroidÌá¹©ÁËÒ»¸ö¸üÇ¿´óµÄ¹ö¶¯¿Ø¼ş_RecyclerView¡£Ëü¿ÉÒÔËµÊÇÒ»¸öÔöÇ¿°æµÄListview,²»½ö¿ÉÒÔÇáËÉÊµÏÖºÍ ListViewÍ¬ÑùµÄĞ§¹û,»¹ÓÅ»¯ÁË
-ListViewÖĞ´æÔÚµÄ¸÷ÖÖ²»×ãÖ®´¦¡£Ê×ÏÈĞÂ½¨Ò»¸ö RecyclerViewTestÏîÄ¿, ²¢ÈÃ Android Studio×Ô¶¯°ïÎÒÃÇ´´½¨ºÃ»î¶¯¡£
+	6.  æ»šåŠ¨æ§ä»¶RecyclerView
+  Androidæä¾›äº†ä¸€ä¸ªæ›´å¼ºå¤§çš„æ»šåŠ¨æ§ä»¶_RecyclerViewã€‚å®ƒå¯ä»¥è¯´æ˜¯ä¸€ä¸ªå¢å¼ºç‰ˆçš„Listview,ä¸ä»…å¯ä»¥è½»æ¾å®ç°å’Œ ListViewåŒæ ·çš„æ•ˆæœ,è¿˜ä¼˜åŒ–äº†
+ListViewä¸­å­˜åœ¨çš„å„ç§ä¸è¶³ä¹‹å¤„ã€‚é¦–å…ˆæ–°å»ºä¸€ä¸ª RecyclerViewTesté¡¹ç›®, å¹¶è®© Android Studioè‡ªåŠ¨å¸®æˆ‘ä»¬åˆ›å»ºå¥½æ´»åŠ¨ã€‚
 
-£¨1£© RecyclerViewµÄ»ù±¾ÓÃ·¨
-  ºÍ°Ù·Ö±È²¼¾ÖÀàËÆ, RecyclerViewÒ²ÊôÓÚĞÂÔöµÄ¿Ø¼ş, ÎªÁËÈÃ RecyclerViewÔÚËùÓĞ Android°æ±¾ÉÏ¶¼ÄÜÊ¹ÓÃ, AndroidÍÅ¶Ó²ÉÈ¡ÁËÍ¬ÑùµÄ·½Ê½,
-½« RecyclerView¶¨ÒåÔÚÁË support¿âµ±ÖĞ¡£Òò´Ë,ÏëÒªÊ¹ÓÃ RecyclerviewÕâ¸ö¿Ø¼ş,Ê×ÏÈĞèÒªÔÚÏîÄ¿µÄ build.gradleÖĞÌí¼ÓÏàÓ¦µÄÒÀÀµ¿â²ÅĞĞ¡£
-  ´ò¿ª app/build.gradleÎÄ¼ş,ÔÚ dependencies±Õ°üÖĞÌí¼ÓÈçÏÂÄÚÈİ:
+ï¼ˆ1ï¼‰ RecyclerViewçš„åŸºæœ¬ç”¨æ³•
+  å’Œç™¾åˆ†æ¯”å¸ƒå±€ç±»ä¼¼, RecyclerViewä¹Ÿå±äºæ–°å¢çš„æ§ä»¶, ä¸ºäº†è®© RecyclerViewåœ¨æ‰€æœ‰ Androidç‰ˆæœ¬ä¸Šéƒ½èƒ½ä½¿ç”¨, Androidå›¢é˜Ÿé‡‡å–äº†åŒæ ·çš„æ–¹å¼,
+å°† RecyclerViewå®šä¹‰åœ¨äº† supportåº“å½“ä¸­ã€‚å› æ­¤,æƒ³è¦ä½¿ç”¨ Recyclerviewè¿™ä¸ªæ§ä»¶,é¦–å…ˆéœ€è¦åœ¨é¡¹ç›®çš„ build.gradleä¸­æ·»åŠ ç›¸åº”çš„ä¾èµ–åº“æ‰è¡Œã€‚
+  æ‰“å¼€ app/build.gradleæ–‡ä»¶,åœ¨ dependenciesé—­åŒ…ä¸­æ·»åŠ å¦‚ä¸‹å†…å®¹:
 dependencies{
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.l'
     testCompile 'junit:junit:4.12'
 }
-Ìí¼ÓÍêÖ®ºóÒªµã»÷Ò»ÏÂ Sync NowÀ´½øĞĞÍ¬²½¡£È»ºóĞŞ¸Ä activity_main.xm1ÖĞµÄ´úÂë,ÈçÏÂËùÊ¾: 
+æ·»åŠ å®Œä¹‹åè¦ç‚¹å‡»ä¸€ä¸‹ Sync Nowæ¥è¿›è¡ŒåŒæ­¥ã€‚ç„¶åä¿®æ”¹ activity_main.xm1ä¸­çš„ä»£ç ,å¦‚ä¸‹æ‰€ç¤º: 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:1ayout_height="match_parent" > 
@@ -24,10 +24,10 @@ dependencies{
 	android:layout_height="match_parent" />
 
 </LinearLayout>
-ÕâÀïÔÚ²¼¾ÖÖĞ¼ÓÈë Recyclerview¿Ø¼ş£ºÏÈÎª RecyclerViewÖ¸¶¨Ò»¸ö id,È»ºó½«¿í¶ÈºÍ¸ß¶È¶¼ÉèÖÃÎª match_pa rent, ÕâÑù RecyclerViewÒ²¾Í
-Õ¼ÂúÁËÕû¸ö²¼¾ÖµÄ¿Õ¼ä¡£ ĞèÒª×¢ÒâµÄÊÇ, ÓÉÓÚ RecyclerView²¢²»ÊÇÄÚÖÃÔÚÏµÍ³ SDKµ±ÖĞµÄ, ËùÒÔĞèÒª°ÑÍêÕûµÄ°üÂ·¾¶Ğ´³öÀ´¡£
-  Ê¹ÓÃ RecyclerViewÀ´ÊµÏÖºÍ ListviewÏàÍ¬µÄĞ§¹û£¬Îª RecyclerView×¼±¸Ò»¸öÊÊÅäÆ÷,ĞÂ½¨ FruitAdapterÀà,ÈÃÕâ¸öÊÊÅäÆ÷¼Ì³Ğ×Ô
-RecyclerView.Adapter,²¢½«·ºĞÍÖ¸¶¨Îª FruitAdapter.viewHoLder¡£ÆäÖĞviewHolderÊÇÔÚ FruitAdapterÖĞ¶¨ÒåµÄÒ»¸öÄÚ²¿Àà,´úÂëÈçÏÂËùÊ¾:
+è¿™é‡Œåœ¨å¸ƒå±€ä¸­åŠ å…¥ Recyclerviewæ§ä»¶ï¼šå…ˆä¸º RecyclerViewæŒ‡å®šä¸€ä¸ª id,ç„¶åå°†å®½åº¦å’Œé«˜åº¦éƒ½è®¾ç½®ä¸º match_pa rent, è¿™æ · RecyclerViewä¹Ÿå°±
+å æ»¡äº†æ•´ä¸ªå¸ƒå±€çš„ç©ºé—´ã€‚ éœ€è¦æ³¨æ„çš„æ˜¯, ç”±äº RecyclerViewå¹¶ä¸æ˜¯å†…ç½®åœ¨ç³»ç»Ÿ SDKå½“ä¸­çš„, æ‰€ä»¥éœ€è¦æŠŠå®Œæ•´çš„åŒ…è·¯å¾„å†™å‡ºæ¥ã€‚
+  ä½¿ç”¨ RecyclerViewæ¥å®ç°å’Œ Listviewç›¸åŒçš„æ•ˆæœï¼Œä¸º RecyclerViewå‡†å¤‡ä¸€ä¸ªé€‚é…å™¨,æ–°å»º FruitAdapterç±»,è®©è¿™ä¸ªé€‚é…å™¨ç»§æ‰¿è‡ª
+RecyclerView.Adapter,å¹¶å°†æ³›å‹æŒ‡å®šä¸º FruitAdapter.viewHoLderã€‚å…¶ä¸­viewHolderæ˜¯åœ¨ FruitAdapterä¸­å®šä¹‰çš„ä¸€ä¸ªå†…éƒ¨ç±»,ä»£ç å¦‚ä¸‹æ‰€ç¤º:
 public cLass FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> { 
 
     private List<Fruit> mFruitList;
@@ -48,7 +48,7 @@ public cLass FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> 
     }
 
     @0verride
-    public ViewHolder onCreateViewHolder(ViewGroup parent,  int viewType) {	//ÓÃÓÚ´´½¨ViewHolderÊµÀı
+    public ViewHolder onCreateViewHolder(ViewGroup parent,  int viewType) {	//ç”¨äºåˆ›å»ºViewHolderå®ä¾‹
 	View view = LayoutInflater.from(parent.getContext())
 	    .inflate(R.1ayout.fruit_item, parent, false);
 	ViewHolder holder = new ViewHoLder(view);
@@ -56,22 +56,22 @@ public cLass FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> 
     }
 
     @0verride
-    public void onBindViewHolder(ViewHolder holder, int position) {		//ÓÃÓÚ¶Ô RecyclerView×ÓÏîµÄÊı¾İ½øĞĞ¸³Öµ
+    public void onBindViewHolder(ViewHolder holder, int position) {		//ç”¨äºå¯¹ RecyclerViewå­é¡¹çš„æ•°æ®è¿›è¡Œèµ‹å€¼
 	Fruit fruit= mFruitList.get(position);
 	holder.fruitImage.setImageResource(fruit.getImageId());
 	hoLder.fruitName.setText(fruit.getName());
     }
 
     @0verride
-    public int getItemCount()  {						//ÓÃÓÚ¸æËß RecycIerviewÒ»¹²ÓĞ¶àÉÙ×ÓÏî
+    public int getItemCount()  {						//ç”¨äºå‘Šè¯‰ RecycIerviewä¸€å…±æœ‰å¤šå°‘å­é¡¹
 	return mFruitList.size();
     }
 
 }
-ÕâÀïViewHolderµÄ¹¹Ôìº¯ÊıÖĞÒª´«ÈëÒ»¸ö view²ÎÊı,Õâ¸ö²ÎÊıÍ¨³£¾ÍÊÇ Recyclerview×ÓÏîµÄ×î²ã²¼¾Ö,Òò´ËÎÒÃÇ¾Í¿ÉÒÔÍ¨¹ı findviewById( )·½
-·¨À´»ñÈ¡µ½²¼¾ÖÖĞµÄ ImageViewºÍ TextViewµÄÊµÀı¡£ FruitAdapte rÖĞÒ²ÓĞÒ»¸ö¹¹Ôìº¯Êı,Õâ¸ö·½·¨ÓÃÓÚ°ÑÒªÕ¹Ê¾µÄÊı¾İÔ´´«½øÀ´, ²¢¸³Öµ¸øÒ»
-¸öÈ«¾Ö±äÁ¿ mFruitList£¬ºóĞøµÄ²Ù×÷¶¼½«ÔÚÕâ¸öÊı¾İÔ´µÄ»ù´¡ÉÏ½øĞĞ¡£
-  ÊÊÅäÆ÷×¼±¸ºÃÁËÖ®ºó,¾Í¿ÉÒÔ¿ªÊ¼Ê¹ÓÃ RecyclerViewÁË, ĞŞ¸Ä MainActivity ÖĞµÄ´úÂë:
+è¿™é‡ŒViewHolderçš„æ„é€ å‡½æ•°ä¸­è¦ä¼ å…¥ä¸€ä¸ª viewå‚æ•°,è¿™ä¸ªå‚æ•°é€šå¸¸å°±æ˜¯ Recyclerviewå­é¡¹çš„æœ€å±‚å¸ƒå±€,å› æ­¤æˆ‘ä»¬å°±å¯ä»¥é€šè¿‡ findviewById( )æ–¹
+æ³•æ¥è·å–åˆ°å¸ƒå±€ä¸­çš„ ImageViewå’Œ TextViewçš„å®ä¾‹ã€‚ FruitAdapte rä¸­ä¹Ÿæœ‰ä¸€ä¸ªæ„é€ å‡½æ•°,è¿™ä¸ªæ–¹æ³•ç”¨äºæŠŠè¦å±•ç¤ºçš„æ•°æ®æºä¼ è¿›æ¥, å¹¶èµ‹å€¼ç»™ä¸€
+ä¸ªå…¨å±€å˜é‡ mFruitListï¼Œåç»­çš„æ“ä½œéƒ½å°†åœ¨è¿™ä¸ªæ•°æ®æºçš„åŸºç¡€ä¸Šè¿›è¡Œã€‚
+  é€‚é…å™¨å‡†å¤‡å¥½äº†ä¹‹å,å°±å¯ä»¥å¼€å§‹ä½¿ç”¨ RecyclerViewäº†, ä¿®æ”¹ MainActivity ä¸­çš„ä»£ç :
 public class MainActivity extends AppCompatActivity{
 
     private List<Fruit> fruitList = new ArrayList<>();
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState)  {
 	super.onCreate(savedInstanceState);
 	setContentView(R.layout.activity_main);
-	initFruits();                                            //³õÊ¼»¯Ë®¹ûÊı¾İ
+	initFruits();                                            //åˆå§‹åŒ–æ°´æœæ•°æ®
 	RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 	LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 	recyclerView.setLayoutManager(layoutManager);
@@ -114,13 +114,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
 }
-ÕâÀïÊ¹ÓÃÁËÒ»¸öÍ¬ÑùµÄ initFruits()·½·¨,ÓÃÓÚ³õÊ¼»¯ËùÓĞµÄË®¹ûÊı¾İ¡£½Ó×ÅÔÚ oncreate()·½·¨ÖĞÎÒÃÇÏÈ»ñÈ¡µ½ RecyclerviewµÄÊµÀı,È»ºó´´½¨
-ÁËÒ»¸ö LinearLayoutManager¶ÔÏó,²¢½«ËüÉèÖÃµ½ RecyclerViewµ±ÖĞ¡£ LayoutManagerÓÃÓÚÖ¸¶¨ RecyclerViewµÄ²¼¾Ö·½Ê½,ÕâÀïÊ¹ÓÃµÄ
-LinearLayoutManagerÊÇÏßĞÔ²¼¾ÖµÄÒâË¼,¿ÉÒÔÊµÏÖºÍ ListViewÀàËÆµÄĞ§¹û¡£½ÓÏÂÀ´´´½¨ÁË FruitAdapterµÄÊµÀı,²¢½«Ë®¹ûÊı¾İ´«Èëµ½ 
-FruitAdapterµÄ¹¹Ôìº¯ÊıÖĞ,×îºóµ÷ÓÃ RecyclerviewµÄ setAdapter()·½·¨À´Íê³ÉÊÊÅäÆ÷ÉèÖÃ,ÕâÑù RecyclerViewºÍÊı¾İÖ®¼äµÄ¹ØÁª¾Í½¨Á¢Íê³ÉÁË¡£
+è¿™é‡Œä½¿ç”¨äº†ä¸€ä¸ªåŒæ ·çš„ initFruits()æ–¹æ³•,ç”¨äºåˆå§‹åŒ–æ‰€æœ‰çš„æ°´æœæ•°æ®ã€‚æ¥ç€åœ¨ oncreate()æ–¹æ³•ä¸­æˆ‘ä»¬å…ˆè·å–åˆ° Recyclerviewçš„å®ä¾‹,ç„¶ååˆ›å»º
+äº†ä¸€ä¸ª LinearLayoutManagerå¯¹è±¡,å¹¶å°†å®ƒè®¾ç½®åˆ° RecyclerViewå½“ä¸­ã€‚ LayoutManagerç”¨äºæŒ‡å®š RecyclerViewçš„å¸ƒå±€æ–¹å¼,è¿™é‡Œä½¿ç”¨çš„
+LinearLayoutManageræ˜¯çº¿æ€§å¸ƒå±€çš„æ„æ€,å¯ä»¥å®ç°å’Œ ListViewç±»ä¼¼çš„æ•ˆæœã€‚æ¥ä¸‹æ¥åˆ›å»ºäº† FruitAdapterçš„å®ä¾‹,å¹¶å°†æ°´æœæ•°æ®ä¼ å…¥åˆ° 
+FruitAdapterçš„æ„é€ å‡½æ•°ä¸­,æœ€åè°ƒç”¨ Recyclerviewçš„ setAdapter()æ–¹æ³•æ¥å®Œæˆé€‚é…å™¨è®¾ç½®,è¿™æ · RecyclerViewå’Œæ•°æ®ä¹‹é—´çš„å…³è”å°±å»ºç«‹å®Œæˆäº†ã€‚
 
-£¨2£©ÊµÏÖºáÏò¹ö¶¯ºÍÆÙ²¼Á÷²¼¾Ö
-  Ê×ÏÈÒª¶Ô fruit_item²¼¾Ö½øĞĞĞŞ¸Ä£¬°Ñ fruit_itemÀïµÄÔªËØ¸Ä³É´¹Ö±ÅÅÁĞ£¬ĞŞ¸Ä fruit_item.xm1ÖĞµÄ´úÂë, ÈçÏÂËùÊ¾:
+ï¼ˆ2ï¼‰å®ç°æ¨ªå‘æ»šåŠ¨å’Œç€‘å¸ƒæµå¸ƒå±€
+  é¦–å…ˆè¦å¯¹ fruit_itemå¸ƒå±€è¿›è¡Œä¿®æ”¹ï¼ŒæŠŠ fruit_itemé‡Œçš„å…ƒç´ æ”¹æˆå‚ç›´æ’åˆ—ï¼Œä¿®æ”¹ fruit_item.xm1ä¸­çš„ä»£ç , å¦‚ä¸‹æ‰€ç¤º:
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:1ayout_width="100dp"
@@ -140,8 +140,8 @@ FruitAdapterµÄ¹¹Ôìº¯ÊıÖĞ,×îºóµ÷ÓÃ RecyclerviewµÄ setAdapter()·½·¨À´Íê³ÉÊÊÅäÆ÷ÉèÖ
 	android:layout_marginTop="10dp  />
 	
 </LinearLayout>
-ÕâÀï½« ImageviewºÍ Textview¶¼ÉèÖÃ³ÉÁËÔÚ²¼¾ÖÖĞË®Æ½¾ÓÖĞ,²¢ÇÒÊ¹ÓÃlayout_marginTopÊôĞÔÈÃÎÄ×ÖºÍÍ¼Æ¬Ö®¼ä±£³ÖÒ»Ğ©¾àÀë¡£
-  ½ÓÏÂÀ´ĞŞ¸Ä MainActivityÖĞµÄ´úÂë, ÈçÏÂËùÊ¾:
+è¿™é‡Œå°† Imageviewå’Œ Textviewéƒ½è®¾ç½®æˆäº†åœ¨å¸ƒå±€ä¸­æ°´å¹³å±…ä¸­,å¹¶ä¸”ä½¿ç”¨layout_marginTopå±æ€§è®©æ–‡å­—å’Œå›¾ç‰‡ä¹‹é—´ä¿æŒä¸€äº›è·ç¦»ã€‚
+  æ¥ä¸‹æ¥ä¿®æ”¹ MainActivityä¸­çš„ä»£ç , å¦‚ä¸‹æ‰€ç¤º:
 public class MainActivity extends AppCompatActivity  {
 
     private List<Fruit> fruitList = new ArrayList<>();
@@ -161,13 +161,13 @@ public class MainActivity extends AppCompatActivity  {
     ...
 
 }
-ÕâÀïµ÷ÓÃ LinearLayoutManagerµÄ setOrientation( )·½·¨À´ÉèÖÃ²¼¾ÖµÄÅÅÁĞ·½Ïò¡£Ä¬ÈÏÊÇ×İÏòÅÅÁĞµÄ£¬´«ÈëLinearLayoutManager.HoRIzoNTAL
-±íÊ¾ÈÃ²¼¾ÖºáĞĞÅÅÁĞ,ÕâÑù RecyclerView¾Í¿ÉÒÔºáÏò¹ö¶¯ÁË¡£
-  Recyclerview½«²¼¾ÖÅÅÁĞµÄ¹¤×÷½»¸øÁËLayoutManger£¬LayoutManagerÖĞÖÆ¶¨ÁËÒ»Ì×¿ÉÀ©Õ¹µÄ²¼¾ÖÅÅÁĞ½Ó¿Ú,×ÓÀàÖ»Òª°´ÕÕ½Ó¿ÚµÄ¹æ·¶À´ÊµÏÖ,
-¾ÍÄÜ¶¨ÖÆ³ö¸÷ÖÖ²»Í¬ÅÅÁĞ·½Ê½µÄ²¼¾Ö¡£
-  ³ıÁË LinearLayoutManagerÖ®Íâ, RecyclerView»¹¸øÎÒÃÇÌá¹©ÁË GridLayoutManagerºÍStaggeredGridLayoutManagerÕâÁ½ÖÖÄÚÖÃµÄ²¼¾ÖÅÅÁĞ·½
-Ê½¡£ GridLayoutManager¿ÉÒÔÓÃÓÚÊµÏÖÍø¸ñ²¼¾Ö, StaggeredGridLayoutManager¿ÉÒÔÓÃÓÚÊµÏÖÆÙ²¼Á÷²¼¾Ö¡£ÕâÀïÎÒÃÇÀ´ÊµÏÖÒ»ÏÂÆÙ²¼Á÷²¼¾Ö¡£
-ĞŞ¸ÄÒ»ÏÂftuit_item.xm1ÖĞµÄ´úÂë,ÈçÏÂËùÊ¾:
+è¿™é‡Œè°ƒç”¨ LinearLayoutManagerçš„ setOrientation( )æ–¹æ³•æ¥è®¾ç½®å¸ƒå±€çš„æ’åˆ—æ–¹å‘ã€‚é»˜è®¤æ˜¯çºµå‘æ’åˆ—çš„ï¼Œä¼ å…¥LinearLayoutManager.HoRIzoNTAL
+è¡¨ç¤ºè®©å¸ƒå±€æ¨ªè¡Œæ’åˆ—,è¿™æ · RecyclerViewå°±å¯ä»¥æ¨ªå‘æ»šåŠ¨äº†ã€‚
+  Recyclerviewå°†å¸ƒå±€æ’åˆ—çš„å·¥ä½œäº¤ç»™äº†LayoutMangerï¼ŒLayoutManagerä¸­åˆ¶å®šäº†ä¸€å¥—å¯æ‰©å±•çš„å¸ƒå±€æ’åˆ—æ¥å£,å­ç±»åªè¦æŒ‰ç…§æ¥å£çš„è§„èŒƒæ¥å®ç°,
+å°±èƒ½å®šåˆ¶å‡ºå„ç§ä¸åŒæ’åˆ—æ–¹å¼çš„å¸ƒå±€ã€‚
+  é™¤äº† LinearLayoutManagerä¹‹å¤–, RecyclerViewè¿˜ç»™æˆ‘ä»¬æä¾›äº† GridLayoutManagerå’ŒStaggeredGridLayoutManagerè¿™ä¸¤ç§å†…ç½®çš„å¸ƒå±€æ’åˆ—æ–¹
+å¼ã€‚ GridLayoutManagerå¯ä»¥ç”¨äºå®ç°ç½‘æ ¼å¸ƒå±€, StaggeredGridLayoutManagerå¯ä»¥ç”¨äºå®ç°ç€‘å¸ƒæµå¸ƒå±€ã€‚è¿™é‡Œæˆ‘ä»¬æ¥å®ç°ä¸€ä¸‹ç€‘å¸ƒæµå¸ƒå±€ã€‚
+ä¿®æ”¹ä¸€ä¸‹ftuit_item.xm1ä¸­çš„ä»£ç ,å¦‚ä¸‹æ‰€ç¤º:
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:1ayout_width="match_parent"
@@ -188,10 +188,10 @@ public class MainActivity extends AppCompatActivity  {
 	android:layout_marginTop="10dp"  />
 
 </LinearLayout>
-ÕâÀï×öÁË¼¸´¦Ğ¡µÄµ÷Õû,Ê×ÏÈ½« LinearLayoutµÄ¿í¶ÈÓÉ100dp¸Ä³ÉÁË match_parent,ÒòÎªÆÙ²¼Á÷²¼¾ÖµÄ¿í¶ÈÓ¦¸ÃÊÇ¸ù¾İ²¼¾ÖµÄÁĞÊıÀ´×Ô¶¯ÊÊÅäµÄ,
-¶ø²»ÊÇÒ»¸ö¹Ì¶¨Öµ¡£»¹Ê¹ÓÃÁËLayout_ma rgin ÊôĞÔÀ´ÈÃ×ÓÏîÖ®¼ä»¥ÁôÒ»µã¼ä¾à,ÕâÑù¾Í²»ÖÁÓÚËùÓĞ×ÓÏî¶¼½ôÌùÔÚÒ»Æğ¡£»¹ÓĞ¾ÍÊÇ½« TextviewµÄ
-¶ÔÆëÊôĞÔ¸Ä³ÉÁË¾Ó×ó¶ÔÆë¡£
-  ½Ó×ÅĞŞ¸Ä MainActivity ÖĞµÄ´úÂë, ÈçÏÂËùÊ¾:
+è¿™é‡Œåšäº†å‡ å¤„å°çš„è°ƒæ•´,é¦–å…ˆå°† LinearLayoutçš„å®½åº¦ç”±100dpæ”¹æˆäº† match_parent,å› ä¸ºç€‘å¸ƒæµå¸ƒå±€çš„å®½åº¦åº”è¯¥æ˜¯æ ¹æ®å¸ƒå±€çš„åˆ—æ•°æ¥è‡ªåŠ¨é€‚é…çš„,
+è€Œä¸æ˜¯ä¸€ä¸ªå›ºå®šå€¼ã€‚è¿˜ä½¿ç”¨äº†Layout_ma rgin å±æ€§æ¥è®©å­é¡¹ä¹‹é—´äº’ç•™ä¸€ç‚¹é—´è·,è¿™æ ·å°±ä¸è‡³äºæ‰€æœ‰å­é¡¹éƒ½ç´§è´´åœ¨ä¸€èµ·ã€‚è¿˜æœ‰å°±æ˜¯å°† Textviewçš„
+å¯¹é½å±æ€§æ”¹æˆäº†å±…å·¦å¯¹é½ã€‚
+  æ¥ç€ä¿®æ”¹ MainActivity ä¸­çš„ä»£ç , å¦‚ä¸‹æ‰€ç¤º:
 public class MainActivity extends AppCompatActivity  {
 
     private List<Fruit> fruitList = new ArrayList<>();
@@ -255,14 +255,14 @@ public class MainActivity extends AppCompatActivity  {
     }
 
 }
-Ê×ÏÈ,ÔÚ onCreate()·½·¨ÖĞ,´´½¨ÁËÒ»¸ö StaggeredGridLayoutManagerµÄÊµÀı¡£StaggeredGridLayoutManager µÄ¹¹Ôìº¯Êı½ÓÊÕÁ½¸ö²ÎÊı, µÚÒ»¸ö
-²ÎÊıÓÃÓÚÖ¸¶¨²¼¾ÖµÄÁĞÊı,µÚ¶ş¸ö²ÎÊıÓÃÓÚÖ¸¶¨²¼¾ÖµÄÅÅÁĞ·½Ïò¡£²»¹ıÓÉÓÚÆÙ²¼Á÷²¼¾ÖĞèÒª¸÷¸ö×ÓÏîµÄ¸ß¶È²»Ò»ÖÂ²ÅÄÜ¿´³öÃ÷ÏÔµÄĞ§¹û,ÕâÀïÊ¹ÓÃ
-getRandomLengthName()Õâ¸ö·½·¨£¬ÓÃRandom¶ÔÏóÀ´´´ÔìÒ»¸ö1µ½20Ö®¼äµÄËæ»úÊı, È»ºó½«²ÎÊıÖĞ´«ÈëµÄ×Ö·û´®ÖØ¸´Ëæ»ú¡£ÔÚ initFruits( )·½·¨
-ÖĞ, Ã¿¸öË®¹ûµÄÃû×Ö¶¼¸Ä³Éµ÷ÓÃ getRandomLengthName( )Õâ¸ö·½·¨À´Éú³É, ÕâÑù¾ÍÄÜ±£Ö¤¸÷Ë®¹ûÃû×ÖµÄ³¤¶Ì²î¾à¶¼±È½Ï´ó, ×ÓÏîµÄ¸ß¶ÈÒ²¾Í¸÷²»
-ÏàÍ¬¡£
+é¦–å…ˆ,åœ¨ onCreate()æ–¹æ³•ä¸­,åˆ›å»ºäº†ä¸€ä¸ª StaggeredGridLayoutManagerçš„å®ä¾‹ã€‚StaggeredGridLayoutManager çš„æ„é€ å‡½æ•°æ¥æ”¶ä¸¤ä¸ªå‚æ•°, ç¬¬ä¸€ä¸ª
+å‚æ•°ç”¨äºæŒ‡å®šå¸ƒå±€çš„åˆ—æ•°,ç¬¬äºŒä¸ªå‚æ•°ç”¨äºæŒ‡å®šå¸ƒå±€çš„æ’åˆ—æ–¹å‘ã€‚ä¸è¿‡ç”±äºç€‘å¸ƒæµå¸ƒå±€éœ€è¦å„ä¸ªå­é¡¹çš„é«˜åº¦ä¸ä¸€è‡´æ‰èƒ½çœ‹å‡ºæ˜æ˜¾çš„æ•ˆæœ,è¿™é‡Œä½¿ç”¨
+getRandomLengthName()è¿™ä¸ªæ–¹æ³•ï¼Œç”¨Randomå¯¹è±¡æ¥åˆ›é€ ä¸€ä¸ª1åˆ°20ä¹‹é—´çš„éšæœºæ•°, ç„¶åå°†å‚æ•°ä¸­ä¼ å…¥çš„å­—ç¬¦ä¸²é‡å¤éšæœºã€‚åœ¨ initFruits( )æ–¹æ³•
+ä¸­, æ¯ä¸ªæ°´æœçš„åå­—éƒ½æ”¹æˆè°ƒç”¨ getRandomLengthName( )è¿™ä¸ªæ–¹æ³•æ¥ç”Ÿæˆ, è¿™æ ·å°±èƒ½ä¿è¯å„æ°´æœåå­—çš„é•¿çŸ­å·®è·éƒ½æ¯”è¾ƒå¤§, å­é¡¹çš„é«˜åº¦ä¹Ÿå°±å„ä¸
+ç›¸åŒã€‚
 
-£¨3£©RecyclerViewµÄµã»÷ÊÂ¼ş
-  ÔÚ RecyclerViewÖĞ×¢²áµã»÷ÊÂ¼ş,ĞŞ¸Ä FruitAdapterÖĞµÄ´úÂë,ÈçÏÂËùÊ¾:
+ï¼ˆ3ï¼‰RecyclerViewçš„ç‚¹å‡»äº‹ä»¶
+  åœ¨ RecyclerViewä¸­æ³¨å†Œç‚¹å‡»äº‹ä»¶,ä¿®æ”¹ FruitAdapterä¸­çš„ä»£ç ,å¦‚ä¸‹æ‰€ç¤º:
 public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHoLder> {
 
     private List<fruit> mFruitList;
@@ -313,7 +313,12 @@ public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHoLder> 
 ...
 
 }
-ÕâÀïÏÈÊÇĞŞ¸ÄÁË viewHolder,ÔÚ viewHolderÖĞÌí¼ÓÁË fruitView±äÁ¿À´±£´æ×ÓÏî×îÍâ²ã²¼¾ÖµÄÊµÀı, È»ºóÔÚ onc reateviewHolde r( )·½·¨ÖĞ
-×¢²áµã»÷ÊÂ¼ş¡£recycleviewÇáËÉÊµÏÖ×ÓÏîÖĞÈÎÒâ¿Ø¼ş»ò²¼¾ÖµÄµã»÷ÊÂ¼ş¡£
+è¿™é‡Œå…ˆæ˜¯ä¿®æ”¹äº† viewHolder,åœ¨ viewHolderä¸­æ·»åŠ äº† fruitViewå˜é‡æ¥ä¿å­˜å­é¡¹æœ€å¤–å±‚å¸ƒå±€çš„å®ä¾‹, ç„¶ååœ¨ onc reateviewHolde r( )æ–¹æ³•ä¸­
+æ³¨å†Œç‚¹å‡»äº‹ä»¶ã€‚recycleviewè½»æ¾å®ç°å­é¡¹ä¸­ä»»æ„æ§ä»¶æˆ–å¸ƒå±€çš„ç‚¹å‡»äº‹ä»¶ã€‚
 
-	
+	7.å°ç»“
+  æœ¬ç« ä» Androidä¸­çš„ä¸€äº›å¸¸è§æ§ä»¶å¼€å§‹å…¥æ‰‹, ä¾æ¬¡ä»‹ç»äº†ï¼š
+*åŸºæœ¬å¸ƒå±€çš„ç”¨æ³•
+*è‡ªå®šä¹‰æ§ä»¶çš„æ–¹æ³•
+*Listviewçš„è¯¦ç»†ç”¨æ³•
+*RecyclerViewçš„ä½¿ç”¨
