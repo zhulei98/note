@@ -1,2 +1,2 @@
 # note
-this is a note file
+ My learning note
