@@ -1,0 +1,581 @@
+
+(1)命令者模式
+例:　打开文件操作代理给 Editor 方法 
+public class Open implements Action { 
+ 
+    private final Editor editor; 
+ 
+    public Open(Editor editor) {
+         this.editor = editor;
+     } 
+ 
+    @Override
+     public void perform() {
+         editor.open();
+     } 
+}
+  使用 List 保存操作序列，然后调用 forEach 方法按顺序执行每一个 Action，下例就是命令发起者
+例: 包含操作序列的宏，可按顺序执行操作 
+public class Macro { 
+ 
+    private final List<Action> actions; 
+ 
+    public Macro() {
+         actions = new ArrayList<>();
+    } 
+ 
+    public void record(Action action) {
+         actions.add(action);
+    } 
+ 
+    public void run() {
+         actions.forEach(Action::perform);
+    } 
+}
+在构建宏时，将每一个命令实例加入 Macro 对象的列表，然后运行宏，就会按顺序执行每 一条命令。
+例:　使用命令者模式构建宏 
+Macro macro = new Macro();
+macro.record(new Open(editor));
+macro.record(new Save(editor));
+macro.record(new Close(editor)); 
+macro.run();
+例:　使用 Lambda 表达式构建宏 
+Macro macro = new Macro();
+macro.record(() -> editor.open());
+macro.record(() -> editor.save());
+macro.record(() -> editor.close());
+macro.run();
+  事实上 ，这些 Lambda 表达式的作用只是调用了一个方法，可以使用方法引用将命令和宏对象关联起来
+例:　使用方法引用构建宏 
+Macro macro = new Macro();
+macro.record(editor::open); 
+macro.record(editor::save); 
+macro.record(editor::close); 
+macro.run();
+
+(2)策略模式
+  策略模式能在运行时改变软件的算法行为。其主要思想是定义一个通用的问题，使用不同的算法来实现，然后将这些算法都封装在一个统一
+接口的背后。
+  以文件压缩为例:
+例:  　定义压缩数据的策略接口 
+public interface CompressionStrategy { 
+ 
+    public OutputStream compress(OutputStream data) throws IOException; 
+ 
+}
+例:  使用 gzip 算法压缩数据 
+public class GzipCompressionStrategy implements CompressionStrategy { 
+ 
+    @Override
+    public OutputStream compress(OutputStream data) throws IOException {
+         return new GZIPOutputStream(data);
+    } 
+}
+例:  使用 zip 算法压缩数据 
+public class ZipCompressionStrategy implements CompressionStrategy { 
+ 
+    @Override
+    public OutputStream compress(OutputStream data) throws IOException {
+         return new ZipOutputStream(data);
+    } 
+}
+  Compressor类有一个CompressionStrategy参数,调用代码可以在运行期使用该参数决定使用哪种压缩策略
+例:　在构造类时提供压缩策略 
+public class Compressor { 
+ 
+    private final CompressionStrategy strategy; 
+ 
+    public Compressor(CompressionStrategy strategy) {
+         this.strategy = strategy;
+    } 
+ 
+    public void compress(Path inFile, File outFile) throws IOException {
+         try (OutputStream outStream = new FileOutputStream(outFile)) {
+             Files.copy(inFile, strategy.compress(outStream));
+         }
+     } 
+}
+例:　使用具体的策略类初始化 
+Compressor Compressor gzipCompressor = new Compressor(new GzipCompressionStrategy()); 
+gzipCompressor.compress(inFile, outFile); 
+ 
+Compressor zipCompressor = new Compressor(new ZipCompressionStrategy()); 
+zipCompressor.compress(inFile, outFile);
+  使用 Lambda 表达式或者方法引用可以去掉样板代码。在这里，可以去掉具体的策略实现，使用一个方法实现算法，这里的算法由构造函数
+中对应的 OutputStream 实现
+例:　使用方法引用初始化 
+Compressor Compressor gzipCompressor = new Compressor(GZIPOutputStream::new); 
+gzipCompressor.compress(inFile, outFile); 
+ 
+Compressor zipCompressor = new Compressor(ZipOutputStream::new); 
+zipCompressor.compress(inFile, outFile);
+
+(3)观察者模式
+  观察者模式是另一种可被 Lambda 表达式简化和改进的行为模式。被观察者持有一个观察者列表。当被观察者的状态发生改变，会通知观察
+者。
+  假设一个情景:我们要观察的对象是月球！ NASA 和外星人都对登陆到月球上的东西感兴趣，都希望可以记录这些信息。NASA希望确保阿波罗
+号上的航天员成功登月；外星人则希望在 NASA 注意力分散之时进犯地球。
+  将观察者称作 LandingObserver。它只有一个 observeLanding 方法，当有东西登陆到月球上时会调用该方法
+例:　用于观察登陆到月球的组织的接口 
+public interface LandingObserver { 
+ 
+    public void observeLanding(String name); 
+ 
+}
+  被观察者是月球 Moon，它持有一组 LandingObserver 实例，有东西着陆时会通知这些观察者，还可以增加新的 LandingObserver 实例观测
+ Moon 对象
+例:　Moon 类 
+public class Moon { 
+ 
+    private final List<LandingObserver> observers = new ArrayList<>(); 
+ 
+    public void land(String name) {
+         for (LandingObserver observer : observers) {
+             observer.observeLanding(name);
+         }
+    } 
+ 
+    public void startSpying(LandingObserver observer) {
+         observers.add(observer);
+    } 
+}
+  有两个具体的类实现了 LandingObserver 接口，分别代表外星人和 NASA检测着陆情况，监测到登陆后它们有不同的反应。
+例:　外星人观察到人类登陆月球 
+public class Aliens implements LandingObserver { 
+ 
+    @Override
+    public void observeLanding(String name) {
+         if (name.contains("Apollo")) {
+             System.out.println("They're distracted, lets invade earth!");
+         }
+     } 
+}
+例:　NASA 观察到有人登陆月球 
+public class Nasa implements LandingObserver {
+     @Override
+     public void observeLanding(String name) { 
+        if (name.contains("Apollo")) {
+            System.out.println("We made it!");
+        }
+     } 
+}
+例:　使用类的方式构建用户代码 
+Moon moon = new Moon(); 
+moon.startSpying(new Nasa());
+moon.startSpying(new Aliens()); 
+ 
+moon.land("An asteroid"); 
+moon.land("Apollo 11");
+例:　使用 Lambda 表达式构建用户代码 
+Moon moon = new Moon(); 
+ 
+moon.startSpying(name -> {
+     if (name.contains("Apollo"))
+         System.out.println("We made it!");
+}); 
+ 
+moon.startSpying(name -> {
+     if (name.contains("Apollo"))
+         System.out.println("They're distracted, lets invade earth!"); 
+}); 
+ 
+moon.land("An asteroid"); moon.land("Apollo 11");
+  无论使用观察者模式或策略模式，实现时采用 Lambda 表达式还是传 统的类，取决于策略和观察者代码的复杂度。
+**************
+  从某种角度来说，将大量代码塞进一个方法会让可读性变差是决定如何使用 Lambda 表达式的黄金法则,也是编写一般方法时的黄金法则！
+														*************
+
+(4)模板方法模式
+  模板方法模式是为这些情况设计的：整体算法的设计是一个抽象类，它有一系列抽象方法，代表算法中可被定制的步骤，同时这个类中包含
+了一些通用代码。算法的每一个变种由具体的类实现，它们重写了抽象方法，提供了相应的实现。
+  假设一个情景:我们是一家银行，需要对公众、公司和 职员放贷。放贷程序大体一致——验明身份、信用记录和收入记录,这些信息来源不一，
+衡量标准也不一样。
+  先使用一个抽象类 LoanApplication 来控制算法结构，该类包含一些贷款调查结果 报告的通用代码。根据不同的申请人，有不同的类：
+CompanyLoanApplication、Personal LoanApplication 和 EmployeeLoanApplication。
+例:　使用模板方法模式描述申请贷款过程 
+public abstract class LoanApplication { 
+ 
+    public void checkLoanApplication() throws ApplicationDenied {
+         checkIdentity();
+         checkCreditHistory();
+         checkIncomeHistory();
+         reportFindings();
+     } 
+ 
+    protected abstract void checkIdentity() throws ApplicationDenied; 
+ 
+    protected abstract void checkIncomeHistory() throws ApplicationDenied; 
+ 
+    protected abstract void checkCreditHistory() throws ApplicationDenied; 
+ 
+    private void reportFindings() {
+
+例:　员工申请贷款是个人申请的一种特殊情况 
+public class EmployeeLoanApplication extends PersonalLoanApplication { 
+ 
+    @Override
+    protected void checkIncomeHistory() {
+         // 这是自己人 !
+     } 
+}
+用 Lambda 表达式或者方法引用实现这些接口，相比使用继承构建算法，就会得到极大的灵活性。
+例:　员工申请贷款
+public class LoanApplication { 
+ 
+    private final Criteria identity;
+    private final Criteria creditHistory;
+    private final Criteria incomeHistory; 
+ 
+    public LoanApplication(Criteria identity,
+                           Criteria creditHistory, 
+                           Criteria incomeHistory) { 
+ 
+        this.identity = identity;
+        this.creditHistory = creditHistory; 
+        this.incomeHistory = incomeHistory;
+    } 
+ 
+    public void checkLoanApplication() throws ApplicationDenied {
+         identity.check();
+         creditHistory.check();
+         incomeHistory.check();
+         reportFindings();
+    } 
+ 
+    private void reportFindings() {
+这里没有使用一系列的抽象方法，而是多出一些属性：identity、 creditHistory 和 incomeHistory。每一个属性都实现了函数接口Criteria，
+该接口检查一项标准，如果不达标就抛出一个问题域里的异常。
+例:　如果申请失败，函数接口 Criteria 抛出异常 
+public interface Criteria { 
+ 
+    public void check() throws ApplicationDenied; 
+ 
+}
+采用这种方式，而不是基于继承的模式的好处是不需要在 LoanApplication 及其子类中实现算法，分配功能时有了更大的灵活性。
+例:　Company 类中的检查方法 
+public void checkIdentity() throws ApplicationDenied; 
+ 
+public void checkProfitAndLoss() throws ApplicationDenied; 
+ 
+public void checkHistoricalDebt() throws ApplicationDenied;
+  为 CompanyLoanApplication 类传入对应的方法引用
+例:　CompanyLoanApplication 类声明了对应的检查方法 
+public class CompanyLoanApplication extends LoanApplication { 
+ 
+    public CompanyLoanApplication(Company company) {
+         super(company::checkIdentity,
+               company::checkHistoricalDebt,
+               company::checkProfitAndLoss);
+    } 
+}
+  使用这种方式能让我们更加紧密地为问题建模。
+
+
+	2.　使用Lambda表达式的领域专用语言
+  领域专用语言（DSL）是针对软件系统中某特定部分的编程语言。它们通常比较小巧，DSL 高度专用：不求面面俱到，但求有所专长。
+  人们通常将 DSL 分为两类：内部 DSL 和外部 DSL。外部 DSL 脱离程序源码编写，然后单独解析和实现。比如级联样式表（CSS）
+和正则表达式，就是常用的外部 DSL;内部 DSL 嵌入编写它们的编程语言中,从某种角度上说，内部DSL就是普通的类库，提供API方便使用。
+  BDD 是测试驱动开发（TDD）的一个变种，它的重点是描述程序的行为，而非一组需要通过的单元测试.一个叫 Jasmine 的 JavaScript
+ BDD 框架:使用 Jasmine 创建测试用例。
+例:　Jasmine describe("A suite is just a function", function() {
+     it("and so is a spec", function() {
+         var a = true; 
+ 
+        expect(a).toBe(true);
+     }); 
+});
+在 JavaScript 使用 function() { … } 来表示 Lambda 表达式。
+  一些概念：
+每一个 规则 描述了程序的一种行为； 
+期望 是描述应用行为的一种方式，在规则中定义； 
+多个 规则 合在一起，形成一个 套件。
+这些概念在传统的测试框架，比如 JUnit 中，都有对应的概念。规则对应一个测试方法， 期望对应断言，套件对应一个测试类。
+(1)　使用Java编写DSL 
+实现后的 Java BDD 框架:
+例:　描述 Stack 的案例 
+public class StackSpec {{ 
+ 
+    describe("a stack", it -> { 
+ 
+        it.should("be empty when created", expect -> {
+             expect.that(new Stack()).isEmpty(); 
+
+        }); 
+ 
+        it.should("push new elements onto the top of the stack", expect -> { 
+            Stack<Integer> stack = new Stack<>();
+            stack.push(1); 
+ 
+            expect.that(stack.get(0)).isEqualTo(1);
+        }); 
+ 
+        it.should("pop the last element pushed onto the stack", expect -> { 
+            Stack<Integer> stack = new Stack<>();
+            stack.push(2); 
+            stack.push(1); 
+ 
+            expect.that(stack.pop()).isEqualTo(2);
+        }); 
+ 
+    }); 
+ 
+}}
+  使用动词 describe 为套件起头,然后定义一个名字表明这是描述什么东西的行为: "a stack"
+每一条规则读起来尽可能接近英语中的句子。以 it.should 打头，其中 it 指正在描述的对象。然后用一句简单的英语描述行为，最后使用
+ expect.that 做前缀，描述期待的行为。
+  检查规则时，会从命令行得到一个简单的报告，表明是否有规则失败。
+
+(2)　实现 
+例:　从 describe 方法开始定义规则 
+public static void describe(String name, Suite behavior) {
+     Description description = new Description(name);
+     behavior.specifySuite(description); 
+}
+  需要一个 Suite 函数接口来表示规则组成的套件,下例中该接口接收一个 Description 对象作为参数，在 describe 方法里将其传入。
+例:　每个测试套件都由一个实现该接口的 Lambda 表达式实现 
+public interface Suite { 
+ 
+    public void specifySuite(Description description); 
+ 
+}
+  不仅套件由 Lambda 表达式实现，每一条规则也是一个 Lambda 表达式。它们也需要定义一个函数接口：Specification
+例:　每条规则都是一个实现该接口的 Lambda 表达式 
+public interface Specification { 
+ 
+    public void specifyBehaviour(Expect expect); 
+ 
+}
+  通过调用 specifySuite 执行 Lambda 表达式。如果规则失败，会 抛出一个标准的 Java AssertionError，而其他任何 Throwable 对象则
+认为是一个错误
+例:　将用 Lambda 表达式表示的规则传入 should 方法 
+public void should(String description, Specification specification) {
+     try {
+         Expect expect = new Expect();
+         specification.specifyBehaviour(expect);
+         Runner.current.recordSuccess(suite, description);
+     } catch (AssertionError cause) {
+         Runner.current.recordFailure(suite, description, cause);
+     } catch (Throwable cause) {
+         Runner.current.recordError(suite, description, cause);
+     } 
+}
+规则通过 expect.that 描述期望的行为， Expect 类需要一个 that 方法供用户调用
+  如下例所示。这里可以封装传入的对象，然后暴露一些常用的方法，如isEqualTo。 如果规则失败，抛出相应的断言。
+例:　期望链的开始 
+public final class Expect { 
+ 
+    public BoundExpectation that(Object value) {
+         return new BoundExpectation(value);
+     } 
+     // 省去类定义的其他部分
+(3)评估
+  流畅性的一方面表现在 DSL 是否是 IDE 友好的。换句话说，你只需记住少量知识，然后用代码自动补全功能补齐代码。这就是使用 
+Description 和 Expect 对象的原因。
+
+
+	3.　使用Lambda表达式的SOLID原则
+(1)　单一功能原则  程序中的类或方法只能有一个改变的理由。
+  单一功能原则不止于此：一个类不仅要功能单一，而且还需将功能封装好。这是强内聚性设计的一部分。说一个类是内聚的，是指它的方法
+和属性需要统一对待，因为它们紧密相关。
+  Lambda 表达式在方法级别能更容易实现单一功能原则。
+例:　计算质数个数，一个方法里塞进了多重职责 
+public long countPrimes(int upTo) {
+     long tally = 0;
+     for (int i = 1; i < upTo; i++) {
+         boolean isPrime = true;
+         for (int j = 2; j < i; j++) {
+             if (i % j == 0) {
+                 isPrime = false;
+              }
+         }
+         if (isPrime) { 
+                tally++;
+         }
+     
+}
+     return tally; 
+}
+上例同时干了两件事：计数和判断一个数是否是质数。
+例:　将 isPrime 重构成另外一个方法，计算质数个数的方法 
+public long countPrimes(int upTo) {
+     long tally = 0;
+     for (int i = 1; i < upTo; i++) {
+         if (isPrime(i)) {
+             tally++;
+         }
+     }
+     return tally; 
+} 
+ 
+private boolean isPrime(int number) {
+     for (int i = 2; i < number; i++) {
+         if (number % i == 0) {
+             return false;
+         }
+     }
+     return true; 
+}
+  使用Java 8的集合流重构上述代码，将循环操作交给类库本身处理。下例使用了 range 方法从 0 至 upTo 计数，然后filter出质数，最后
+对结果做 count。
+例:　使用集合流重构质数计数程序 
+public long countPrimes(int upTo) {
+     return IntStream.range(1, upTo)
+                     .filter(this::isPrime)
+                     .count(); 
+} 
+ 
+private boolean isPrime(int number) {
+     return IntStream.range(2, number)
+                     .allMatch(x -> (number % x) != 0); 
+}
+例:　并行运行基于集合流的质数计数程序 
+public long countPrimes(int upTo) {
+     return IntStream.range(1, upTo)
+                     .parallel()
+                     .filter(this::isPrime)
+                     .count(); 
+} 
+ 
+private boolean isPrime(int number) {
+     return IntStream.range(2, number)
+             .allMatch(x -> (number % x) != 0); 
+}
+  利用高阶函数，可以轻松实现功能单一原则。
+
+(2)　开闭原则   软件应该对扩展开放，对修改闭合。
+  闭原则的首要目标和单一功能原则类似：让软件易于修改。一个新增功能或一处改动， 会影响整个代码，容易引入新的缺陷。开闭原则保证
+已有的类在不修改内部实现的基础上可扩展，这样就努力避免了上述问题。
+例:　MetricDataGraph 类的公开 API 
+class MetricDataGraph { 
+ 
+    public void updateUserTime(int value); 
+ 
+    public void updateSystemTime(int value); 
+ 
+    public void updateIoTime(int value); 
+ 
+}
+  用一个新类 TimeSeries 来表示各种时间点。这时， MetricDataGraph 类的公开 API 就得以简化，不必依赖于某项具体指标
+例:　MetricDataGraph 类简化之后的 API 
+class MetricDataGraph { 
+ 
+    public void addTimeSeries(TimeSeries values); 
+ 
+}
+  使用 ThreadLocal 生成一个 DateFormatter 实例
+例:　ThreadLocal 日期格式化器 
+ThreadLocal<DateFormat> localFormatter
+     = ThreadLocal.withInitial(() -> new SimpleDateFormat()); 
+ 
+DateFormat formatter = localFormatter.get();
+  通过传入不同的 Lambda 表达式，可以得到完全不同的行为。
+例:　ThreadLocal 标识符 
+AtomicInteger threadId = new AtomicInteger(); 
+ThreadLocal<Integer> localId
+     = ThreadLocal.withInitial(() -> threadId.getAndIncrement()); 
+ 
+int idForThisThread = localId.get();
+  对开闭原则的另外一种理解和传统的思维不同，那就是使用不可变对象实现开闭原则。不可变对象是指一经创建就不能改变的对象。
+***所谓的原则 只应作为指导，而不应教条地全盘接受，走向极端***
+
+(3)　依赖反转原则   抽象不应依赖细节，细节应该依赖抽象。
+  依赖反转原则的目的是让程序员脱离底层粘合代码，编写上层业务逻辑代码,
+  从一种假想的标记语言中提取标题，其中标题以冒号（ ：）结尾。先读取文件，逐行检查，滤出标题，然后关闭文件。将和读写文件有关的
+异常封装成接近待解决问题的异常：HeadingLookupException
+例:　解析文件中的标题 
+public List<String> findHeadings(Reader input) {
+     try (BufferedReader reader = new BufferedReader(input)) {
+         return reader.lines()
+                      .filter(line -> line.endsWith(":"))
+                      .map(line -> line.substring(0, line.length() - 1))
+                      .collect(toList());
+     } catch (IOException e) {
+         throw new HeadingLookupException(e);
+     } 
+}
+  使用 Stream<String> 作为抽象，让代码依赖它，而不是文件。传入一个函数，在读文件出问题时，创建一个问题域里的异常,将问题域里的
+异常处理和资源管理的异常处理分开
+例:　剥离了文件处理功能后的业务逻辑 
+public List<String> findHeadings(Reader input) {
+     return withLinesOf(input,
+                        lines -> lines.filter(line -> line.endsWith(":"))
+                                      .map(line -> line.substring(0, line.length()-1))
+                                      .collect(toList()),
+                        HeadingLookupException::new); 
+}
+例:　定义 withLinesOf 方法 
+private <T> T withLinesOf(Reader input,
+                           Function<Stream<String>, T> handler,
+                           Function<IOException, RuntimeException> error) { 
+ 
+    try (BufferedReader reader = new BufferedReader(input)) {
+         return handler.apply(reader.lines());
+     } catch (IOException e) {
+         throw error.apply(e);
+     } 
+}
+withLinesOf 方法接受一个 Reader 参数处理文件读写，然后将其封装进一个 Buffered- Reader 对象，这样就可以逐行读取文件了
+
+
+	4.　要点回顾
+ Lambda 表达式能让很多现有设计模式更简单、可读性更强，尤其是命令者模式。
+ 在 Java 8 中，创建领域专用语言有更多的灵活性。
+ 在 Java 8 中，有应用 SOLID 原则的新机会。
+
+
+*****************************************************************************************************************************
+*****************************************************************************************************************************
+
+		第九章	    使用Lambda表达式编写并发程序
+	
+	1.　为什么要使用非阻塞式I/O
+  非阻塞式 I/O，有时也叫异步 I/O，可以处理大量并发网络连接，而且一个线程可以为多 个连接服务。和阻塞式 I/O 不同，对聊天程序客户
+端的读写调用立即返回，真正的读写操 作则在另一个独立的线程执行，这样就可以同时执行其他任务了。
+
+
+	2.  回调
+  使用 Vert.x 框架实现简单的聊天应用,来展示非阻塞式 I/O 的原则
+例:　接收 TCP 连接 
+public class ChatVerticle extends Verticle { 
+ 
+    public void start() {
+         vertx.createNetServer()
+              .connectHandler(socket -> {
+                  container.logger().info("socket connected");
+                  socket.dataHandler(new User(socket, this));
+               }).listen(10_000); 
+ 
+        container.logger().info("ChatVerticle started");
+     } 
+ 
+}
+   Verticle 是 Vert.x 框架中部署的原子单元。上述代码的入口是 start 方法，它和普通 Java 程序中的 main 方法类似。在聊天应用中，
+用它建立一个接收 TCP 连接的服务器。
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

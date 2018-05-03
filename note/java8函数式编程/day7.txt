@@ -1,0 +1,239 @@
+
+
+例:　处理用户连接 
+public class User implements Handler<Buffer> { 
+ 
+    private static final Pattern newline = Pattern.compile("\\n"); 
+ 
+    private final NetSocket socket;
+    private final Set<String> names;
+    private final EventBus eventBus; 
+ 
+    private Optional<String> name; 
+ 
+    public User(NetSocket socket, Verticle verticle) {
+        Vertx vertx = verticle.getVertx(); 
+ 
+        this.socket = socket;
+        names = vertx.sharedData().getSet("names");
+        eventBus = vertx.eventBus();
+        name = Optional.empty();
+    } 
+ 
+    @Override
+    public void handle(Buffer buffer) {
+         newline.splitAsStream(buffer.toString())
+                .forEach(line -> {
+                    if (!name.isPresent())
+                        setName(line);
+                    else
+                        handleMessage(line);
+                 });
+     } 
+ 
+    // Class continues...
+  这里使用了正则表达式 java.util.regex.Pattern 的一个实例 newline 来匹配换行符。
+例:　注册聊天消息 
+eventBus.registerHandler(name, (Message<String> msg) -> {
+     sendClient(msg.body()); 
+});
+egisterHandler方法将一个处理程序和一个地址关联，有消息发送给该地址时，就将之作为参数传递给处理程序，并且自动调用处理程序。这里
+使用用户名作为地址。
+例:　发送聊天信息 
+eventBus.send(user, name.get() + ‘>’ + message);
+例:　向关注者群发消息 
+private void broadcastMessage(String message) {
+     String name = this.name.get();
+     eventBus.publish(name + ".followers", name + ‘>’ + message); 
+}
+例:　接收群发的消息 
+private void followUser(String user) {
+     eventBus.registerHandler(user + ".followers", (Message<String> message) -> {
+         sendClient(message.body());
+     }); 
+}
+  如果将消息发送到有多个处理程序监听的地址，则会轮询决定哪个处理程序会接收到消息。这意味着在注册地址时要多加小心。
+
+
+	3.　消息传递架构
+  verticle 对象之间通过向事件总线发送消息通信，不需要保护任何共享状态，不需要在代码中添加锁或使用synchronized关键字，编写并发
+程序变得更加简单。Vert.x 没有限制只能使用字符串传递消息，可以使用更复杂的 JSON 对象，甚至使用 Buffer 类构建自己的消息。这些消
+息是可变的，也就是说如果使用不当，消息发送者和接收者可以通过读写消息共享状态。
+  基于消息传递的系统让隔离错误变得简单，也便于编写可靠的代码。如果一个消息处理程序发生错误，可以选择重启本地 verticle 对象，而
+不用去重启整个 JVM。
+  我们希望在有限的并行运行的线程里，执行更多的 I/O 操作，比如连接更多的聊天客户端。无论哪种情况，解决方案都是一样的：使用 
+Lambda 表达式表示行为，构建 API 来管理并发。聪明的类库意味着简单的应用代码。
+
+
+	4.　末日金字塔
+  如果编写代码时使用了大量的回调，代码会变得难于阅读，即便使用了 Lambda 表达式也是如此。
+例:　检测聊天服务器上两个朋友是否能发消息的测试 
+@Test 
+public void messageFriend() {
+     withModule(() -> {
+         withConnection(richard -> {
+             richard.dataHandler(data -> {
+                 assertEquals("bob>oh its you!", data.toString());
+                     moduleTestComplete();
+             }); 
+ 
+             richard.write("richard\n");
+             withConnection(bob -> {
+                 bob.dataHandler(data -> {
+                     assertEquals("richard>hai", data.toString());
+                     bob.write("richard<oh its you!");
+                 });
+                 bob.write("bob\n");
+                 vertx.setTimer(6, id -> richard.write("bob<hai"));
+             });
+         });
+     }); 
+}
+嵌套的回调形成了一个末日金字塔。代码不断地向屏幕右方挤过去，就像一座金字塔。
+  使用 with 方法，而不使用 try-with-resources 的方式，好处是它符合本章非阻塞线程模型。重构代码:
+例:　分成多个方法后的测试代码，测试聊天服务器上两个朋友是否能发消息 
+@Test 
+public void canMessageFriend() {
+     withModule(this::messageFriendWithModule); 
+} 
+ 
+private void messageFriendWithModule() {
+     withConnection(richard -> {
+         checkBobReplies(richard);
+         richard.write("richard\n");
+         messageBob(richard);
+     }); 
+} 
+ 
+private void messageBob(NetSocket richard) {
+     withConnection(messageBobWithConnection(richard)); 
+} 
+ 
+private Handler<NetSocket> messageBobWithConnection(NetSocket richard) { 
+
+     return bob -> {
+         checkRichardMessagedYou(bob);
+         bob.write("bob\n");
+         vertx.setTimer(6, id -> richard.write("bob<hai"));
+     }; 
+} 
+
+private void checkRichardMessagedYou(NetSocket bob) {
+     bob.dataHandler(data -> {
+         assertEquals("richard>hai", data.toString());
+         bob.write("richard<oh its you!");
+     }); 
+} 
+ 
+private void checkBobReplies(NetSocket richard) {
+     richard.dataHandler(data -> {
+         assertEquals("bob>oh its you!", data.toString());
+         moduleTestComplete();
+     }); 
+}
+将测试逻辑分散在了多个方法里，解决了末日金字塔问题。不再是一个方法只能有一个功能,代码还是难于阅读，想要链接或组合的操作越多，
+问题就会越严重
+
+
+	5.　Future
+  构建复杂并行操作的另外一种方案是使用 Future。Future 像一张欠条，方法不是返回一个值， 而是返回一个 Future 对象，该对象第一次
+创建时没有值，但以后能拿它“换回”一个值。
+例:　使用 Future 从外部网站下载专辑信息 
+@Override 
+public Album lookupByName(String albumName) {
+     Future<Credentials> trackLogin = loginTo("track");    //登录提供曲目和艺术家信息的服务
+     Future<Credentials> artistLogin = loginTo("artist"); 
+     try {
+         Future<List<Track>> tracks = lookupTracks(albumName, trackLogin.get());    //使用登录后的凭证查询曲目和艺术家信息
+         Future<List<Artist>> artists = lookupArtists(albumName, artistLogin.get()); 
+ 
+        return new Album(albumName, tracks.get(), artists.get());    //构建待返回的专辑对象
+     } catch (InterruptedException | ExecutionException e) {
+         throw new AlbumLookupException(e.getCause());     //将其转化为一个待解问题域内的异常，然后将其抛出
+     } 
+}
+	6.　CompletableFuture
+  CompletableFuture结合了Future对象打欠条的主意和使用回调处理事件驱动的任务。其要点是可以组合不同的实例，而不用担心末日金字塔
+问题。
+例:　使用 CompletableFuture 从外部网站下载专辑信息 
+public Album lookupByName(String albumName) {
+     CompletableFuture<List<Artist>> artistLookup
+         = loginTo("artist")
+          .thenCompose(artistLogin -> lookupArtists(albumName, artistLogin)); 
+ 
+     return loginTo("track")
+           .thenCompose(trackLogin -> lookupTracks(albumName, trackLogin)) 
+           .thenCombine(artistLookup, (tracks, artists)
+               -> new Album(albumName, tracks, artists)) 
+           .join();  
+}
+loginTo、lookupArtists 和 lookupTracks 方法均返回 CompletableFuture ,而不是 Future。CompletableFuture  API的技巧是注册 Lambda
+表达式，并且把高阶函数链 接起来。方法不同，但道理和 Stream API 的设计是相通的。
+例:　为 Future 提供值 
+CompletableFuture<Artist> createFuture(String id) {
+     CompletableFuture<Artist> future = new CompletableFuture<>();
+     startJob(future);
+     return future; 
+}
+例:　为 Future 提供一个值，完成工作 
+future.complete(artist);
+
+例:　异步创建 CompletableFuture 实例
+CompletableFuture<Track> lookupTrack(String id) {
+     return CompletableFuture.supplyAsync(() -> { 
+        // 这里会做一些繁重的工作 
+        // ...         
+     return track; 
+
+    }, service);  
+}
+例:　出现错误时完成 Future 
+future.completeExceptionally(new AlbumLookupException("Unable to find " + name));
+  想在链的末端执行一些代码而不返回任何值，比如 Consumer 和 Runnable，那就看看 thenAccept 和 thenRun 方法。 
+  可使用 thenApply方法转换CompletableFuture对象的值
+  在 CompletableFuture 对象出现异常时，可使用 exceptionally 方法恢复，可以将一个函数注册到该方法，返回一个替代值。 
+  如果想有一个 map，包含异常情况和正常情况，请使用 handle 方法。 
+  要找出 CompletableFuture 对象到底出了什么问题，可使用 isDone 和 isCompletedExceptionally 方法辅助调查
+
+
+	7.　响应式编程
+  CompletableFuture 背后的概念可以从单一的返回值推广到数据流，这就是响应式编程。响应式编程其实是一种声明式编程方法，它让程序员
+以自动流动的变化和数据流来编程。
+  search 方法根据名字和国籍过滤结果，它在本 地缓存了一份艺术家名单，但必须从外部服务上查询艺术家信息，比如国籍。
+例:　通过名字和国籍查找艺术家 
+public Observable<Artist> search(String searchedName,
+                                 String searchedNationality,
+                                 int maxResults) { 
+ 
+    return getSavedArtists() 
+           .filter(name -> name.contains(searchedName)) 
+           .flatMap(this::lookupArtist) 
+           .filter(artist -> artist.getNationality() 
+                                   .contains(searchedNationality))
+           .take(maxResults);  
+}
+这个 API 很像使用 Stream。它和 Stream 的最大区别是：Stream 是为了计算 最终结果，而 RxJava 在线程模型上则像 CompletableFuture。
+例:　给 Observable 对象传值，并且完成它 
+observer.onNext("a"); 
+observer.onNext("b"); 
+observer.onNext("c"); 
+observer.onCompleted();
+不停地调用 onNext 方法，Observable 对象中的每个值都调用一次。这可以在一个循环里做，也可以在任何想要生成值的线程里做。
+例:　通知 Observable 对象有错误发生 
+observer.onError(new Exception());
+
+	8.　何时何地使用新技术
+  有两种情况可能特别适合使用响应式或事件驱动的方式来思考。
+  第一种情况是业务逻辑本身就使用事件来描述。
+  另一种显然的用例是应用需要同时处理大量 I/O 操作。阻塞式 I/O 需要同时使用大量线程，这会导致大量锁之间的竞争和太多的上下文切
+换。如果想要处理成千上万的连接，非阻塞式 I/O 通常是更好的选择。
+
+
+	9.　要点回顾
+  使用基于 Lambda 表达式的回调，很容易实现事件驱动架构。
+  CompletableFuture 代表了 IOU，使用 Lambda 表达式能方便地组合、合并。 
+  Observable 继承了 CompletableFuture 的概念，用来处理数据流。
+
+
+
+ 

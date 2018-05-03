@@ -1,0 +1,319 @@
+
+	6.  滚动控件RecyclerView
+  Android提供了一个更强大的滚动控件_RecyclerView。它可以说是一个增强版的Listview,不仅可以轻松实现和 ListView同样的效果,还优化了
+ListView中存在的各种不足之处。首先新建一个 RecyclerViewTest项目, 并让 Android Studio自动帮我们创建好活动。
+
+（1） RecyclerView的基本用法
+  和百分比布局类似, RecyclerView也属于新增的控件, 为了让 RecyclerView在所有 Android版本上都能使用, Android团队采取了同样的方式,
+将 RecyclerView定义在了 support库当中。因此,想要使用 Recyclerview这个控件,首先需要在项目的 build.gradle中添加相应的依赖库才行。
+  打开 app/build.gradle文件,在 dependencies闭包中添加如下内容:
+dependencies{
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:recyclerview-v7:24.2.l'
+    testCompile 'junit:junit:4.12'
+}
+添加完之后要点击一下 Sync Now来进行同步。然后修改 activity_main.xm1中的代码,如下所示: 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:1ayout_height="match_parent" > 
+
+    <android.support.v7.widget.RecyclerView
+	android:id="@+id/recycler_view"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" />
+
+</LinearLayout>
+这里在布局中加入 Recyclerview控件：先为 RecyclerView指定一个 id,然后将宽度和高度都设置为 match_pa rent, 这样 RecyclerView也就
+占满了整个布局的空间。 需要注意的是, 由于 RecyclerView并不是内置在系统 SDK当中的, 所以需要把完整的包路径写出来。
+  使用 RecyclerView来实现和 Listview相同的效果，为 RecyclerView准备一个适配器,新建 FruitAdapter类,让这个适配器继承自
+RecyclerView.Adapter,并将泛型指定为 FruitAdapter.viewHoLder。其中viewHolder是在 FruitAdapter中定义的一个内部类,代码如下所示:
+public cLass FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHolder> { 
+
+    private List<Fruit> mFruitList;
+
+    static class ViewHolder extends RecyclerView.ViewHotder{
+	ImageView fruitImage;
+	TextView fruitName;
+
+	publlc ViewHolder(View view)  {
+	super(view);
+	fruitImage = (ImageView) view.findViewById(R.id.fruit_image);
+	fruitName = (TextView) view.findViewById(R.id.fruit_name);
+	}
+    }
+
+    public FruitAdapter(List<Fruit> fruitList) {
+	mFruitList = fruitList;
+    }
+
+    @0verride
+    public ViewHolder onCreateViewHolder(ViewGroup parent,  int viewType) {	//用于创建ViewHolder实例
+	View view = LayoutInflater.from(parent.getContext())
+	    .inflate(R.1ayout.fruit_item, parent, false);
+	ViewHolder holder = new ViewHoLder(view);
+	return holder;
+    }
+
+    @0verride
+    public void onBindViewHolder(ViewHolder holder, int position) {		//用于对 RecyclerView子项的数据进行赋值
+	Fruit fruit= mFruitList.get(position);
+	holder.fruitImage.setImageResource(fruit.getImageId());
+	hoLder.fruitName.setText(fruit.getName());
+    }
+
+    @0verride
+    public int getItemCount()  {						//用于告诉 RecycIerview一共有多少子项
+	return mFruitList.size();
+    }
+
+}
+这里ViewHolder的构造函数中要传入一个 view参数,这个参数通常就是 Recyclerview子项的最层布局,因此我们就可以通过 findviewById( )方
+法来获取到布局中的 ImageView和 TextView的实例。 FruitAdapte r中也有一个构造函数,这个方法用于把要展示的数据源传进来, 并赋值给一
+个全局变量 mFruitList，后续的操作都将在这个数据源的基础上进行。
+  适配器准备好了之后,就可以开始使用 RecyclerView了, 修改 MainActivity 中的代码:
+public class MainActivity extends AppCompatActivity{
+
+    private List<Fruit> fruitList = new ArrayList<>();
+
+    @0verride
+    protected void onCreate(Bundle savedInstanceState)  {
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.activity_main);
+	initFruits();                                            //初始化水果数据
+	RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+	LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+	recyclerView.setLayoutManager(layoutManager);
+	FruitAdapter adapter = new FruitAdapter(fruitList);
+	recyclerView.setAdapter(adapter);
+    }
+
+    private void initFruits()  {
+	for(int i = 0; i < 2; i++) {
+	    Fruit apple = new Fruit("Apple", R.drawable.apple_pic);
+	    fruitList.add(apple);
+	    Fruit banana = new Fruit("Banana", R.drawable.banana_pic);
+	    fruitList.add(banana);
+	    Fruit orange = new Fruit("Orange", R.drawable.orange_pic);
+	    fruitList.add(orange);
+	    Fruit watermelon = new Fruit("Watermelon", R.drawable.watermelon_pic);
+	    fruitList.add(watermelon);
+	    Fruit pear = new Fruit("Pear", R.drawable.pear_pic);
+	    fruitList.add(pear);
+	    Fruit grape = new Fruit("Grape", R.drawable.grape_pic);
+	    fruitList.add(grape);
+	    Fruit pineapple = new Fruit("Pineapple", R.drawable.pineapple_pic);
+	    fruitList.add(pineapple);
+	    Fruit strawberry = new Fruit("Strawberry", R.drawable.strawberry_pic);
+	    fruitList.add(strawberry);
+	    Fruit cherry = new Fruit("Cherry", R.drawable.cherry_pic);
+	    fruitList.add(cherry);
+	    Fruit mango = new Fruit("Mango", R.drawable.mango_pic);
+	    fruitList.add(mango);
+	}
+    }
+
+}
+这里使用了一个同样的 initFruits()方法,用于初始化所有的水果数据。接着在 oncreate()方法中我们先获取到 Recyclerview的实例,然后创建
+了一个 LinearLayoutManager对象,并将它设置到 RecyclerView当中。 LayoutManager用于指定 RecyclerView的布局方式,这里使用的
+LinearLayoutManager是线性布局的意思,可以实现和 ListView类似的效果。接下来创建了 FruitAdapter的实例,并将水果数据传入到 
+FruitAdapter的构造函数中,最后调用 Recyclerview的 setAdapter()方法来完成适配器设置,这样 RecyclerView和数据之间的关联就建立完成了。
+
+（2）实现横向滚动和瀑布流布局
+  首先要对 fruit_item布局进行修改，把 fruit_item里的元素改成垂直排列，修改 fruit_item.xm1中的代码, 如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:1ayout_width="100dp"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+	android:id="@+id/fruit_image"
+	android:layout_width=wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_horizontal"  />
+
+    <TextView
+	android:id="@+id/fruit_name"
+	android:layout_width="wrap_content"
+	android:11ayout_height="wrap_content"
+	android:1ayout_gravity="center_horizontal"
+	android:layout_marginTop="10dp  />
+	
+</LinearLayout>
+这里将 Imageview和 Textview都设置成了在布局中水平居中,并且使用layout_marginTop属性让文字和图片之间保持一些距离。
+  接下来修改 MainActivity中的代码, 如下所示:
+public class MainActivity extends AppCompatActivity  {
+
+    private List<Fruit> fruitList = new ArrayList<>();
+
+    @0verride 
+    protected void onCreate(Bundte savedInstanceState)  {
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.activity_main);
+	initFruits();
+	RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+	LinearLayoutManagerlayoutManager = new LinearLayoutManager(this);
+	layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+	recyclerView.setLayoutManager(layoutManager);
+	FruitAdapter adapter = new FruitAdapter(fruitList);
+	recyclerView.setAdapter(adapter);
+    }
+    ...
+
+}
+这里调用 LinearLayoutManager的 setOrientation( )方法来设置布局的排列方向。默认是纵向排列的，传入LinearLayoutManager.HoRIzoNTAL
+表示让布局横行排列,这样 RecyclerView就可以横向滚动了。
+  Recyclerview将布局排列的工作交给了LayoutManger，LayoutManager中制定了一套可扩展的布局排列接口,子类只要按照接口的规范来实现,
+就能定制出各种不同排列方式的布局。
+  除了 LinearLayoutManager之外, RecyclerView还给我们提供了 GridLayoutManager和StaggeredGridLayoutManager这两种内置的布局排列方
+式。 GridLayoutManager可以用于实现网格布局, StaggeredGridLayoutManager可以用于实现瀑布流布局。这里我们来实现一下瀑布流布局。
+修改一下ftuit_item.xm1中的代码,如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:1ayout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp" >
+
+    <ImageView
+	android:id="@+id/fruit_image"
+	android:layout_width=wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_horizontal"  />
+
+    <TextView
+	android:id="@+id/fruit_name"
+	android:layout_width="wrap_content"
+	android:11ayout_height="wrap_content"
+	android:layout_gravity="left"
+	android:layout_marginTop="10dp"  />
+
+</LinearLayout>
+这里做了几处小的调整,首先将 LinearLayout的宽度由100dp改成了 match_parent,因为瀑布流布局的宽度应该是根据布局的列数来自动适配的,
+而不是一个固定值。还使用了Layout_ma rgin 属性来让子项之间互留一点间距,这样就不至于所有子项都紧贴在一起。还有就是将 Textview的
+对齐属性改成了居左对齐。
+  接着修改 MainActivity 中的代码, 如下所示:
+public class MainActivity extends AppCompatActivity  {
+
+    private List<Fruit> fruitList = new ArrayList<>();
+
+    @0verride 
+    protected void onCreate(Bundte savedInstanceState)  {
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.activity_main);
+	initFruits();
+	RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+	StaggeredGridLayoutManager layoutManager = new   
+	StaggeredGridLayoutManager(3,  StaggeredGridLayoutManager.VERTICAL);
+	recyclerView.setLayoutManager(layoutManager);
+	FruitAdapter adapter = new FruitAdapter(fruitList);
+	recyclerView.setAdapter(adapter);
+    }
+
+    private void initFruits()  {
+        for  (int i = 0; i < 2; i++)  {	
+	    Fruit apple = new Fruit(
+	        getRandomLengthName("Applle") , R.drawable.apple_pic);
+	    fruitList.add(apple);
+	    Fruit bnana = new Fruit(
+	        getRandomLengthName("Bnana") , R.drawable.apple_pic);
+	    fruitList.add(banana);
+	    Fruit orange = new Fruit(
+	        getRandomLengthName("Orange") , R.drawable.apple_pic);
+	    fruitList.add(orange);
+	    Fruit watermelon = new Fruit(
+	        getRandomLengthName("Watermelon") , R.drawable.apple_pic);
+	    fruitList.add(watermelon);
+	    Fruit pear = new Fruit(
+	        getRandomLengthName("Pear") , R.drawable.apple_pic);
+	    fruitList.add(pear);
+	    Fruit grape = new Fruit(
+	        getRandomLengthName("Grape") , R.drawable.apple_pic);
+	    fruitList.add(grape);
+	    Fruit pineapple = new Fruit(
+	        getRandomLengthName("Pineapple") , R.drawable.apple_pic);
+	    fruitList.add(pineapple);
+	    Fruit strawberry = new Fruit(
+	        getRandomLengthName("Strawberry") , R.drawable.apple_pic);
+	    fruitList.add(strawberry);
+	    Fruit cherry = new Fruit(
+	        getRandomLengthName("Cherry") , R.drawable.apple_pic);
+	    fruitList.add(Cherry);
+	    Fruit mango = new Fruit(
+	        getRandomLengthName("Mango") , R.drawable.apple_pic);
+	    fruitList.add(mango);
+        }
+    }
+    
+    private String getRandomLengthName(String name) {
+	Random random = new Random();
+	intlength = random.nextInt(20)+1;
+	StringBuilder buiLder = new StringBuiLder();
+	for(int i = 0, i < length; i++) {
+	    builder.append(name);
+        }
+	return builder.toString();
+    }
+
+}
+首先,在 onCreate()方法中,创建了一个 StaggeredGridLayoutManager的实例。StaggeredGridLayoutManager 的构造函数接收两个参数, 第一个
+参数用于指定布局的列数,第二个参数用于指定布局的排列方向。不过由于瀑布流布局需要各个子项的高度不一致才能看出明显的效果,这里使用
+getRandomLengthName()这个方法，用Random对象来创造一个1到20之间的随机数, 然后将参数中传入的字符串重复随机。在 initFruits( )方法
+中, 每个水果的名字都改成调用 getRandomLengthName( )这个方法来生成, 这样就能保证各水果名字的长短差距都比较大, 子项的高度也就各不
+相同。
+
+（3）RecyclerView的点击事件
+  在 RecyclerView中注册点击事件,修改 FruitAdapter中的代码,如下所示:
+public class FruitAdapter extends RecyclerView.Adapter<FruitAdapter.ViewHoLder> {
+
+    private List<fruit> mFruitList;
+
+    static class ViewHolLder extends RecyclerView.ViewHolder{
+	View fruitView;
+	ImageView fruitImage;
+	TextView fruitName;
+
+	public ViewHolder(View view)  {
+	    super(view);
+	    fruitView = view;
+	    fruitImage = (ImageView)  view.findViewById(R.id.fruit_image);
+	    fruitName = (TextView) view.findViewById(R.id.fruit_name);
+	}
+    }
+
+    public FruitAdapter(List<Fruit> fruitList)  {
+	mFruitList_ fruitList;
+    }
+
+    @0verride
+    public ViewHolder onCreateViewHolder(ViewGroup parent,  int viewType)  {
+	View view = LayoutInflater.from(parent.getContext()).inflate(R.1ayout.	
+	    fruit_item, parent, false);
+	final ViewHolder holder = new ViewHoLder(view);
+	holder.fruitView.setOnClickListener(new View.0nClickListener()  {
+	@0verride
+	public void onClick(View v)  {
+	    int position= holder.getAdapterPosition();
+	    Fruit fruit= mFruitList.get(position);
+	    Toast.makeText(v.getContext() , "you clicked view"+ fruit.getName(),
+		Toast.LENGTH_SHORT).show();
+	}
+    });
+    holder.fruitImage.setOnCLickListener(new View.0nClickListener()  {
+	@0verride
+	public void onClick(View v)  {
+	    int position = holder.getAdapterPosition();	
+	    Fruit fruit = mFruitList.get(position);
+	    Toast.makeText(v.getContext() , "you clicked image"+ fruit.getName(),
+		Toast.LENGTH_SHORT).show();
+	}
+    });
+    return holder;
+  }
+
+...
+
+}
+这里先是修改了 viewHolder,在 viewHolder中添加了 fruitView变量来保存子项最外层布局的实例, 然后在 onc reateviewHolde r( )方法中
+注册点击事件。recycleview轻松实现子项中任意控件或布局的点击事件。
+
+	

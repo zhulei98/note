@@ -1,0 +1,654 @@
+
+	3. 详解5种基本布局
+  布局是一种可用于放置很多控件的容器,它可以按照一定的规律调整内部控件的位置,从而编写出精美的界面。其内部也可以放置布局, 通过多
+层布局的嵌套,就能够完成一些比较复杂的界面。
+
+（1）线性布局
+  LinearLayout又称作线性布局,它会将所包含的控件在线性方向上依次排列。android:orientation属性指定了排列方向是vertica1时，控件会
+在垂直方向上排列，android:orientation属性指定了排列方向是horizontal时，控件会在水平方向排列。
+例：修改 activity_main.xm1 中的代码, 如下所示
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+	android:id="@+id/buttonl"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="Button  1"  />
+
+     <Button
+	android:id="@+id/button2"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="Button  2"  />
+
+     <Button
+	android:id="@+id/button3"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="Button  3"  />
+
+</LinearLayout>
+LinearLayout中添加了3个 Button, 每个Button的长和宽都是 wrap_content, 并指定了排列方向是 vertical。
+  然后修改一下 LinearLayout的排列方向,如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    ...
+
+</LinearLayout>
+  重新运行程序，会发现控件在水平方向上依次排列（不指定默认就是水平排列）。
+  android:gravity用于指定文字在控件中的对齐方式, 而 android:layout_g ravity用于指定控件在布局中的对齐方式。
+例：修改 activity_main.xm1 中的代码, 如下所示
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+	android:id="@+id/buttonl"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="top"
+	android:text="Button  1"  />
+
+     <Button
+	android:id="@+id/button2"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_vertical"
+	android:text="Button  2"  />
+
+     <Button
+	android:id="@+id/button3"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:1ayout_gravity="bottom"
+	android:text="Button  3"  />
+
+</LinearLayout>
+由于目前 LinearLayout的排列方向是 horizonta1, 因此只能指定垂直方向上的排列方向,将第一个 Button的对齐方式指定为top,第二个Button
+的对齐方式指定为 center_vertica1,第三个Button的对齐方式指定为 bottom。
+  android:layout_weight属性允许我们使用比例的方式来指定控件的大小，它在手机屏幕的适配性方面可以起到非常重要的作用。比如我们正在
+编写一个消息发送界面,需要一个文本编辑拒和一个发送按钮。
+例：修改 activity_main.xm1 中的代码, 如下所示
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+	android:id="@+id/input_message"
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	android:hint="Type something"
+	/>
+
+    
+     <Button
+	android:id="@+id/send"
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:1ayout_weight="1"
+	android:text="Send"  
+	/> 
+
+</LinearLayout>
+由于我们使用了android:Layout_weight属性,此时控件的宽度就不应该再由 android:Layout_width来决定,这里指定成 Odp是一种比较规范的写
+法。然后在 EditText和 Button里都将 android:layout_weight属性的值指定为1,这表示EditText和 Button将在水平方向平分宽度。
+例：修改 activity_main.xm1 中的代码, 如下所示
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+	android:id="@+id/input_message"
+	android:layout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_weight="1"
+	android:hint="Type something"
+	/>
+
+    
+     <Button
+	android:id="@+id/send"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="Send"  
+	/> 
+
+</LinearLayout>
+这里仅指定了 EditText的 android:1_ayout_weight属性,并将 Button的宽度改回wrap_content。这表示 Button的宽度仍然按照 wrap_content
+来计算,而 EditText则会占满屏幕所有的剩余空间,实现了宽度自适配效果。
+
+（2）相对布局
+  RelativeLayout又称作相对布局,它比LinearLayout显得更加随意一些，它可以通过相对定位的方式让控件出现在布局的任何位置。
+例：修改 activity_main.xm1 中的代码, 如下所示
+<RelativeLayout xmlLns: android="http: //schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+	android:id="@+id/buttonl"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:1ayout_alignParentLeft="true"
+	android:layout_alignParentTop="true"
+	android:text="Button  1"  />
+
+    <Button
+	android:id="@+id/button2"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:1ayout_alignParentRight="true"
+	android:layout_alignParentTop="true"
+	android:text="Button  2"  />
+
+    <Button
+	android:id="@+id/button3"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:1ayout_centerInParent="true"
+	android:text="Button  3"  />
+
+    <Button
+	android:id="@+id/button4"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentBottom="true"
+	android:1ayout_alignParentLeft="true"
+	android:text="Button  4"  />
+
+    
+    <Button
+	android:id="@+id/button5"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_alignParentBottom="true"
+	android:1ayout_alignParentRight="true"
+	android:text="Button  5"  />
+
+</RelativeLayout>
+这里让 Button1和父布局的左上角对齐, Button2和父布局的右上角对齐, Button3居中显示, Button4和父布局的左下角对齐, Button5和父布局
+的右下角对齐。
+  让控件相对于控件进行定位，修改 activity_main.xm1 中的代码, 如下所示：
+<RelativeLayout xmlLns: android="http: //schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+	android:id="@+id/button3"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:1ayout_centerInParent="true"
+	android:text="Button  3"  />
+
+    <Button
+	android:id="@+id/button1"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_above="@id/button3"
+	android:layout_toLeftof="@id/button3"
+	android:text="Button  1"  />
+
+    <Button
+	android:id="@+id/button2"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_above="@id/button3"
+	android:layout_toRightof="@id/button3"
+	android:text="Button  2"  />
+
+    <Button
+	android:id="@+id/button4"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_below="@id/button3"
+	android:layout_toLeftof="@id/button3"
+	android:text="Button  4"  />
+
+    
+    <Button
+	android:id="@+id/button5"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_below="@id/button3"
+	android:layout_toRightof="@id/button3"
+	android:text="Button  5"  />
+
+</RelativeLayout>
+android:1ayout_above属性可以让一个控件位于另一个控件的上方,需要为这个属性指定相对控件 id的引用,这里我们填入了@id/button3,表示
+让该控件位于 Buttoa3的上方，android:1ayout_below属性表示让一个控件位于另一个控件的下方。android:1ayout_toLeftof 表示让一个控件
+位于另一个控件的左側, android:layout_toRightof 表示让一个控件位于另一个控件右侧。
+  android:layout_alignLeft 表示让一个控件的左边缘和另一个控件的左边缘对齐，android:layout_alignRight表示让一个控件的右边缘和另
+一个控件的右边缘对齐。
+
+（3）帧布局
+  FrameLayout又称作帧布局,这种布局没有方便的定位方式,所有的控件都会默认摆放在布局的左上角。
+例：修改 activity_main.xm1 中的代码, 如下所示
+<FrameLayout xmlLns: android="http: //schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+	android:id="@+id/text_view"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:text="This  is TextView"
+	/>
+
+    <Imageview
+	android:id="@+id/image_view"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:src="@mipmap/ic_1auncher"
+	/>
+
+</FrameLayout>
+总体来讲, FrameLayout由于定位方式的欠缺,导致它的应用场景也比较少。
+
+（4）百分比布局
+  在百分比布局布局中,可以不再使用 wrap_content、 match_parent等方式来指定控件的大小,而是允许直接指定控件在布局中所占的百分比, 
+这样的话就可以轻松实现平分布局甚至是任意比例分割布局的效果了。由于 LinearLayout本身已经支持按比例指定控件的大小了,因此百分比布
+局只为 FrameLayout和 RelativeLayout进行了功能扩展,提供了 PercentFrameLayout和 PercentRelativeLayout这两个全新的布局。
+
+（5）约束布局
+  ConstraintLayout非常适合使用可视化的方式来编写界面，但并不太适合使用XML的方式来进行编写。ConstraintLayout还有一个优点，它可以
+有效地解决布局嵌套过多的问题。它使用约束的方式来指定各个控件的位置和关系的，有点类似于RelativeLayout，但远比RelativeLayout要更
+强大。
+  1）基本操作   ConstraintLayout的基本用法很简单，比如我们想要向布局中添加一个按钮，那么只需要从左侧的Palette区域拖一个Button
+		进去就可以了。如果一个控件没有添加任何约束的话，它在运行之后会自动位于界面的左上角。添加约束最基本的用法是用鼠标
+		拖拽；删除约束的方式一共有三种，第一种用于删除一个单独的约束，将鼠标悬浮在某个约束的圆圈上，然后该圆圈会变成红
+		色，这个时候单击一下就能删除了。第二种用于删除某一个控件的所有约束，选中一个控件，然后它的左下角会出现一个删除
+        	约束的图标，点击该图标就能删除当前控件的所有约束了。第三种用于删除当前界面中的所有约束，点击工具栏中的删除约束
+		图标即可
+  2）Inspector  在Inspector中有一个纵向的轴和一个横向的轴，这两个轴也是用于确定控件的位置的。Android Studio给控件的每个方向上
+		的约束都默认添加了一个16dp的间距，从Inspector上面也可以明显地看出来这些间距的值。如果这些默认值并不是你想要的，
+		可以直接在Inspector上进行修改。
+		位于Inspector最中间的那个正方形区域，它是用来控制控件大小的。一共有三种模式可选，每种模式都使用了一种不同的符
+		号表示，点击符号即可进行切换。 
+  3）Guidelines 首先点击通知栏中的Guidelines图标可以添加一个垂直或水平方向上的Guideline，这里我们需要的是垂直方向上的。而Guideline
+		默认是使用的dp尺，我们需要选中Guideline，并点击一下最上面的箭头图标将它改成百分比尺，然后将垂直方向上的Guideline
+		调整到50%的位置，这样就将准备工作做好了。
+		我们给登录按钮的右边向Guideline添加约束，登录按钮的下面向底部添加约束，并拖动按钮让它距离底部64dp。然后给注册
+		按钮的左边向Guideline添加约束，注册按钮的下面向登录按钮的下面添加约束。这样就实现了让两个按钮在水平方向上居中
+		显示，在垂直方向上都距离底部64dp的功能了。
+  4）自动添加约束
+		自动添加约束的方式主要有两种，一种叫Autoconnect，一种叫Inference
+		想要使用Autoconnect，首先需要在工具栏中将这个功能启用，默认情况下Autoconnect是不启用的。Autoconnect可以根据我
+		们拖放控件的状态自动判断应该如何添加约束，比如我们将Button放到界面的正中央，那么它的上下左右都会自动地添加上约
+		束。
+		Inference会给当前界面中的所有元素自动添加约束。因而Inference比较适合用来实现复杂度比较高的界面，它可以一键自动
+		生成所有的约束。       
+
+	4.创建自定义控件
+  创建自定义控件有两种简单方法。先将准备工作做好,创建一个UICustomViews项目。
+（1）引入布局
+  新建一个布局 title.xm1,代码如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/title_bg"> 
+
+    <Button
+	android:id="@+id/title_back"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content" 
+	android:layout_gravity="center"
+	android:1ayout_margin="5dp"
+	android:background="@drawable/back_bg"
+	android:text="Back"
+	android:textCo1or="#fff"  />
+
+    <TextView
+	android:id="@+id/title_text"
+	android:1ayout_width="0dp"
+	android:layout_height="wrap_content"
+	android:layout_gravity="center"
+	android:1ayout_weight="1"
+	android:gravity="center"
+	android:text="Title Text"
+	android:textColor="#fff"
+	android:textSize="24sp"  />
+
+    <Button
+	android:id="@+id/title_edit"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:1ayout_gravity="center"
+	android:Layout_margin="5dp"
+	android:background="@drawable/edit_bg"
+	android:text="Edit"
+	android:textCoLor="#fff"  />
+
+</LinearLayout>
+android:background用于为布局或控件指定一个背景, 可以使用颜色或图片来进行填充。android:layout_margin属性可以指定控件在上下左右
+方向上偏移的距离,当然也可以使用android:layout_marginLeft或and roid:layout_marginTop等属性来单独指定控件在某个方向上偏移的距离。
+  现在标题程布局已经编写完成了, 剩下的就是在程序中使用这个标题栏了, 修activity_main.xml中的代码, 如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    <include layout="@layout/title" />
+
+</LinearLayout>
+  最后在 MainActivity中将系统自带的标题栏隐藏掉, 代码如下所示:
+public class MainActivity extends AppCompatActivity{
+    
+    @0verride
+    protected void onCreate(Bundle savedInstanceState)  {
+	super.onCreate(savedInstanceState);
+	setContentView(R.1ayout.activity_main);
+	ActionBar actionbar = getSupportActionBar();
+	if  (actionbar  != null)  {
+	    actionbar.hide( );
+	}
+    }
+}
+这里调用了 getsupportActionBar()方法来获得 ActionBar的实例,然后再调用ActionBar的 hide( )方法将标题栏隐藏起来。
+  使用这种方式, 不管有多少布局需要添加标题栏, 只需一行 include语句就可以了。
+
+（2）创建自定义控件
+  新建 TitleLayout继承自 LinearLayout, 让它成为自定义的标题栏控件, 代码如下所示:
+pubLic class TitleLayout extends LinearLayout{
+    public TitleLayout(Context context, AttributeSet attrs) {
+	super(context, attrs);
+	LayoutInflater.from(context).inflate(R.1ayout.title, this);
+    }
+}
+这里首先重写了 LinearLayout中带有两个参数的构造函数,在布局中引入 TitleLayout控件就会调用这个构造函数。然后通过 LayoutInflater
+的 from( )方法可以构建出一个 LayoutInfLater对象，接着调用 inflate( )方法就可以动态加载一个布局文件。inflate( )方法接收两个参数,
+第一个参数是要加载的布局文件的 id,这里传入 R.1ayout.title,第二个参数是给加载好的布局再添加一个父布局,这里想要指定为TitleLayout,
+于是直接传入this。 
+  在布局文件中添加这个自定义控件, 修改activity_main.xml中的代码, 如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:tayout_width="match_parent"
+    android:1ayout_height="match_parent" > 
+
+    <com.example.uicustomviews.TitleLayout
+	  android:tayoutwidth="match_parent"
+          android:1ayout_height="wrap_content" />
+
+</LinearLayout>
+  下面为标题栏中的按钮注册点击事件, 修改 TitleLayout中的代码, 如下所示:
+pubLic class TitleLayout extends LinearLayout{
+    public TitleLayout(Context context, AttributeSet attrs) {
+	super(context, attrs);
+	LayoutInflater.from(context).inflate(R.1ayout.title, this);
+	Button titleBack=(Button) findViewById(R.id.title_back);
+	Button titleEdit=(Button) findViewById(R.id.titte_edit);
+	titleBack.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View v) {
+		((Activity) getContext()).finish();
+	    }
+	});
+	titleEdit.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View v) {
+		Toast.makeText(getContext(),  "You clicked Edit button",
+		    Toast. LENGTH_SHORT).show();
+	    }
+	});
+    }
+}
+首先还是通过 findViewById()方法得到按钮的实例,然后分别调用 setOnClickListener()方法给两个按钮注册了点击事件, 当点击返回按钮时
+销毁掉当前的活动, 当点击编辑按钮时弹出一段文本。
+  这样的话,每当我们在一个布局中引入 TitleLayout时, 返回按钮和编辑按钮的点击事件就已经自动实现好了, 这就省去了很多编写重复代码
+的工作。
+
+	5. ListView
+  当程序中有大量的数据需要展示的时候,可以借助 ListView来实现。ListView允许用户通过手指上下滑动的方式将屏幕外的数据滚动到屏幕内,
+同时屏幕上原有的数据则会滚动出屏幕。
+ 
+（1）ListView的简单用法
+  首先新建一个 ListviewTest项目,然后修改activity_main.xm1中的代码, 如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:tayout_width="match_parent"
+    android:1ayout_height="match_parent" > 
+
+    <ListView
+	android:id="@+id/1ist_view"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent" />
+
+</LinearLayout> 
+这里在布局中加入 ListView控件
+  接下来修改 MainActivity中的代码,如下所示:
+public class MainActivity extends AppCompatActivity{
+
+    private String[] data={ "Apple","Banana", "0range", "Watermelon",
+	"Pear", "Grape", "Pineapple". "Strawberry", "Cherry", "Mango",
+	"Applle", "Banana", "0range", "Watermelon", "Pear", "Grape",
+	"Pineapple", "Strawberry", "Cherry","Mango" };
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	setContentView(R.1ayout.activity_main);
+	ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+	    MainActivity.this,android.R.layout.simple_list_item_1, data);
+	ListViewlistView= (ListView) findViewById(R.id.1ist_view);
+	listView.setAdapter(adapter);         
+    }
+}
+这里简单使用了一个data数组来测试, 里面包含了很多水果的名称。不过,数组中的数据是无法直接传递给 ListView的,还需要借助适配器来完成。
+ArrayAdapter可以通过泛型来指定要适配的数据类型, 然后在构造函数中把要适配的数据传入。用 Listview的 setAdapter( )方法,将构建好的
+适配器对象传递进去,这样Listview和数据之间的关联就建立完成了。 
+
+（2）定制 ListView的界面
+  首先需要准备好一组图片, 分别对应上面提供的每一种水果, 使这些水果名称的旁边都有一个图样。
+  接着定义一个实体类, 作为 Listview适配器的适配类型。新建类 Fruit, 代码如下所示:
+public class Fruit{
+    
+    private String name;
+
+    private int imageId;
+
+    public Fruit(String name,  int imageId)  {
+	this,name = name;
+	this.imageId = imageId;
+    }
+
+    public String getName()  {
+	return name;
+    }
+ 
+    public int getImageId()  {
+	return imageId;
+    }
+
+}
+Fruit类中只有两个字段, name表示水果的名字, imageId表示水果对应图片的资源 id。
+  然后需要为 Listview的子项指定一个我们自定义的布局,在1ayout目录下新建fruit_item.xml,代码如下所示:
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:tayout_width="match_parent"
+    android:1ayout_height="match_parent" > 
+
+    <Imageview
+	android:id="@+id/fruit_image"
+	android:layout_width="wrap_content"
+	android:1ayout_height="wrap_content"  />
+
+    <TextView
+	android:id="@+id/fruit_name"
+	android:layout_width="wrap_content"
+	android:layout_height="wrap_content"
+	android:layout_gravity="center_vertica1"
+	android:1ayout_marginLeft="10dp"  />
+
+</LinearLayout>
+在这个布局中,定义了一个 Imageview用于显示水果的图片,又定义了一个 TextView用于显示水果的名称, 并让 TextView在垂直方向上居中显示。
+  接下来需要创建一个自定义的适配器,这个适配器继承自 ArrayAdapter,并将泛型指定为Fruit类。新建类 FruitAdapter,代码如下所示:    
+public class FruitAdapter extends ArrayAdapter<Fruit> {
+
+    private int resourceId;
+
+    public FruitAdapter(Context context, int textViewResourceId,
+			List<Fruit> objects) {
+	super(context, textViewResourceId, objects);
+	resourceId = textviewResourceId;
+	}
+
+	@0verride 
+	public View getView(int position, View convertview,  viewGroup parent)  {
+	    Fruit fruit= getItem(position);                                             //获取当前项的Fruit实例   
+	    View view= LayoutInflater.from(getContext()).inflate(resourceId,  parent,
+	    false);   
+	    ImageView fruitImage= (ImageView)  view.findViewById(R.id.fruit_image);
+	    TextView fruitName=  (TextView)  view.findViewById(R.id.fruit_name);
+	    fruitImage.setImageResource(fruit.getImageId());
+	    fruitName.setText(fruit.getName());
+	    return view;
+	}
+}
+FruitAdapter重写了父类的一组构造函数, 用于将上下文Listview子项布局的 id和数据都传递进来。另外又重写了 getview( )方法, 这个方法
+在每个子项被滚动到屏幕内的时候会被调用。在 getview()方法中,首先通过 getItem()方法得到当前项的 Fruit实例,然后使用LayoutInflater
+来为这个子项加载传入的布局。接下来调用 view的 findviewById()方法分别获取到 ImageView和TextView的实例, 并分别调用它们的setImageResource( )
+和 setText()方法来设置显示的图片和文字, 最后将布局返回, 这样自定义的适配器就完成了。
+  下面修改 MainActivity 中的代码, 如下所示:
+public class MainActivity extends AppCompatActivity{
+
+    private List<Fruit> fruitList = new ArrayList<>();
+
+    @0verride
+    protected void onCreate(Bundle savedInstanceState)  {
+	super.onCreate(savedInstanceState);
+	setContentView(R.layout.activity_main);
+	initFruits();                                       //初始化水果数据
+	FruitAdapter adapter = new FruitAdapter(MainActivity.this,
+	    R.layout.fruit_item,fruitList);
+	ListView listView = (ListView)  findViewById(R.id.list_view);
+	listView.setAdapter(adapter);
+
+    private void initFruits()  {
+	for(int i = 0; i < 2; i++) {
+	    Fruit apple = new Fruit("Apple", R.drawable.apple_pic);
+	    fruitList.add(apple);
+	    Fruit banana = new Fruit("banana", R.drawable.banana_pic);
+	    fruitList.add(banana);
+	    Fruit orange = new Fruit("orange", R.drawable.orange_pic);
+	    fruitList.add(orange);
+	    Fruit watermelon = new Fruit("watermelon", R.drawable.watermelon_pic);
+	    fruitList.add(watermelon);
+	    Fruit pear = new Fruit("pear", R.drawable.pear_pic);
+	    fruitList.add(pear);
+	    Fruit grape = new Fruit("grape", R.drawable.grape_pic);
+	    fruitList.add(grape);
+	    Fruit pineapple = new Fruit("pineapple", R.drawable.pineapple_pic);
+	    fruitList.add(pineapple);
+	    Fruit strawberry = new Fruit("strawberry", R.drawable.strawberry_pic);
+	    fruitList.add(strawberry);
+	    Fruit cherry = new Fruit("cherry", R.drawable.cherry_pic);
+	    fruitList.add(cherry);
+	    Fruit mango = new Fruit("mango", R.drawable.mango_pic);
+	    fruitList.add(mango);
+	}
+    }
+
+}
+这里使用了一个 for循坏将所有的水果数据添加了两通,这是因为如果只添加一遍的话,数据量还不足以充满整个屏幕。接着在 onCreate( )方法
+中创建了 FruitAdapter对象,并将 FruitAdapter作为适配器传递给 Listview, 这样定制 Listview界面的任务就完成了。
+
+（3）提升ListView的运行效率
+   getview()方法中还有一个 convertview参数,这个参数用于将之前加载好的布局进行缓存，以便以后进行重用。修改FruitAdapter中的代码：
+public class FruitAdapter extends ArrayAdapter<Fruit> {
+
+    ...
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+	Fruit fruit = getItem(position);
+	View view;
+	if(convertView == null) {
+	    view = LayoutInflater.from(getContext()).inflate(resourceId, parent,
+		false);
+	} else{
+	    view = convertView;
+	}
+	ImageView fruitImage = (ImageView) view.findViewById(R.id.fruit_image);
+	TextView fruitName = (TextView) view.findViewById(R.id.fruit_name);
+	fruitImage.setImageResource(fruit.getImageId());
+	return view;
+    }
+
+}
+这里在 getview( )方法中进行了判断,如果 convertview为 nu1l,则使用LayoutInflater去加载布局,如果不为 null则直接对 convertView进行
+重用。这样就大大提高了 Listview的运行效率, 在快速滚动的时候也可以表现出更好的性能。
+  可以借助一个 viewHolder来进一步优化,修改 FruitAdapter中的代码,如下：
+pub1ic class FruitAdapter extends ArrayAdapter<Fruit> {
+
+    ...
+
+    @Override
+    pubLic View getView(int position, View convertView, ViewGroup parent) {
+	Fruit fruit = getItem(position);
+	View, view;
+	ViewHoLder viewHolder;
+	if (convertView == nu11)  {
+	    view = LayoutInflater.from(getContext()).inflate(resourceId, parent,
+		false);
+	    viewHolder = new ViewHolder();
+	    viewHolder.fruitImage_(ImageView) view.findViewById
+	    (R.id.fruit_image);
+	    viewHolder.fruitName = (TextView) view.findViewById (R.id.fruit_name);
+	    view.setTag(viewHolder);                                                //将 ViewHoLder存储在 View 中
+	} else{
+	    view = convertView;
+	    viewHolder = (ViewHolder)view.getTag();                                 //重新获取ViewHolder
+	}
+	viewHolder.fruitImage.setImageResource(fruit.getImageId());
+	viewHolder.fruitName.setText(fruit.getName());
+	return view;
+    }
+
+    class ViewHolder{
+	
+	ImageView fruitImage;
+
+	TextView fruitName;
+    }
+
+}
+这里新増了一个内部类 ViewHolder,用于对控件的实例进行缓存。当 convertview为 null的时候,创建一个 ViewHolder对象,并将控件的实例都
+存放在 viewHolder里,然后调用 view的 setTag()方法,将ViewHolder对象存储在 view中。当 convertview不为 nulL的时候,则调用 View的 
+getTag()方法,把 viewHolder重新取出。这样所有控件的实例都缓存在了ViewHolder里, 就没有必要每次都通过 findviewById( )方法来获取
+控件实例了。 	
+
+（4）ListView的点击事件
+  修改 MainActivity中的代码, 如下所示:
+public class MainActivity extends AppCompatActivity{   
+
+    private list<Fruit> fruitList = new ArrayList<>();
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState)  {
+	super.onCreate(savedInstanceState);
+	setContentView(R.Layout.activity_main);
+	initFruits();
+	FruitAdapter adapter = new FruitAdapter(MainActivity.this, R.1ayout.
+	fruit_item, fruitList);
+	ListViewListView = (ListView)  findViewById(R.id.1ist_view);
+	listView.setAdapter(adapter);
+	ListView.setOnItemClickListener(new AdapterView.0nItemClickListener() {
+	    @0verride
+	    public void onItemClick(AdapterView<?> parent, View view,
+				    int position, long id) {
+	        Fruit fruit = fruitList.get(position);
+	        Toast.makeText(MainActivity.this, fruit.getName(),
+		    Toast.LENGTH_SHORT).show();
+	    }
+	});
+    }
+ 
+    ...
+
+}
+这里使用 setOnItemClickListener( )方法为 ListView注册了一个监听器, 当用户点击了 Listview中的任何一个子项时,就会回调onItemClick()
+方法。在这个方法中可以通过 position参数判断出用户点击的是哪一个子项,然后获取到相应的水果,并通过 Toast将水果的名字显示出来。
+
