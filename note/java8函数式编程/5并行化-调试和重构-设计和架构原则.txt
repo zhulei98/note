@@ -1,0 +1,373 @@
+	
+	7.并行化数组操作
+  数组上的并行化操作
+  方法名              操作 
+parallelPrefix      任意给定一个函数，计算数组的和 
+parallelSetAll      使用 Lambda 表达式更新数组元素 
+parallelSort        并行化对数组元素排序
+例:  使用 for 循环初始化数组 
+public static double[] imperativeInitilize(int size) {
+     double[] values = new double[size];
+     for(int i = 0; i < values.length;i++) {
+         values[i] = i;
+     }
+     return values; 
+}
+例: 　使用并行化数组操作初始化数组 
+public static double[] parallelInitialize(int size) {
+     double[] values = new double[size];
+     Arrays.parallelSetAll(values, i -> i);
+     return values; 
+}
+  首先提供了一个用 于操作的数组，然后传入一个 Lambda 表达式，根据数组下标计算元素的值。在该例中， 数组下标和元素的值是一样的。
+*****使用这些方法有一点要小心：它们改变了传入的数组，而 没有创建一个新的数组*****
+  parallelPrefix 操作擅长对时间序列数据做累加，它会更新一个数组，将每一个元素替换 为当前元素和其前驱元素的和
+例:  计算简单滑动平均数 
+public static double[] simpleMovingAverage(double[] values, int n) {  //参数 n 是时间窗口的大小
+     double[] sums = Arrays.copyOf(values, values.length);   //由于要使用的并行操作会改变数组内容，为了不修改原有数据,在此处复制了一份输入数据
+     Arrays.parallelPrefix(sums, Double::sum);               //执行并行操作，将数组的元素相加
+     int start = n - 1;					     
+     return IntStream.range(start, sums.length) 	     //使用 Intstream.range 得到包含所需元素下标的流
+                     .mapToDouble(i -> {
+                         double prefix = i == start ? 0 : sums[i - n];
+                         return (sums[i] - prefix) / n; q    //使用总和减去窗口起始值，然后再除以 n 得到平均值
+                     })
+                     .toArray(); 			     //将流转换为数组
+}
+
+
+	8.要点回顾
+  数据并行化是把工作拆分，同时在多核 CPU 上执行的方式。
+  如果使用流编写代码，可通过调用 parallel 或者 parallelStream 方法实现数据并行化操作。 
+  影响性能的五要素是：数据大小、源数据结构、值是否装箱、可用的 CPU 核数量，以及处理每个元素所花的时间。
+
+*****************************************************************************************************************************
+*****************************************************************************************************************************
+
+
+				第七章  测试  调试 和 重构
+  本章主要探讨如何在代码中使用 Lambda 表达式的技术，也会说明什么情况下不应该（直接）使用 Lambda 表达式。本章还讲述了如何调试
+大量使用 Lambda 表达式和流的程序
+
+
+	1.重构候选项
+  这里有一些要点，可以帮助确定什么时候应该 Lambda 化自己的应用或类库。其中每一条都可看作一个局部的反模式或代码异味，借助于
+Lambda 化可以修复。
+***代码异味:程序开发领域，代码中的任何可能导致深层次问题的症状。代码异味推动着重构的进行***
+***反模式（英文：Anti-patterns或pitfalls）, 是指用来解决问题的带有共同性的不良方法***
+  (1)例:  logger 对象使用 isDebugEnabled 属性避免不必要的性能开销 
+Logger logger = new Logger(); 
+if (logger.isDebugEnabled()) {
+     logger.debug("Look at this: " + expensiveOperation()); 
+}
+这段代码先调用 isDebugEnabled 方法抽取布尔值，用来检查是否启用调试级别，如果启用，则调用 Logger 对象的相应方法记录日志。这种
+反模式通过传入代码即数据的方式很容易解决。与其查询并设置一个对象的值，不如 传入一个 Lambda 表达式，该表达式按照计算得出的值
+执行相应的行为
+例: 　使用 Lambda 表达式简化记录日志代码 
+Logger logger = new Logger(); 
+logger.debug(() -> "Look at this: " + expensiveOperation());
+ Lambda 表达式，外面的代码根本不需要 检查日志级别。
+
+  (2)孤独的覆盖 
+例:  在数据库中查找艺术家 
+ThreadLocal<Album> thisAlbum = new ThreadLocal<Album> () {
+     @Override protected Album initialValue() {
+         return database.lookupCurrentAlbum();
+     }
+};
+  在 Java 8 中，可以为工厂方法 withInitial 传入一个 Supplier 对象的实例来创建对象
+例: 使用工厂方法 
+ThreadLocal<Album> thisAlbum
+     = ThreadLocal.withInitial(() -> database.lookupCurrentAlbum());
+*************** 随着语言的演进，编程习惯也要与时俱进 *****************
+  (3)同样的东西写两遍 
+  增加一个简单的 Order 类来 计算用户购买专辑的一些有用属性，如计算音乐家人数、曲目和专辑时长等。如使用命令式 Java:
+例:   Order 类的命令式实现  
+public long countRunningTime() {
+     long count = 0;
+     for (Album album : albums) {
+         for (Track track : album.getTrackList()) {
+             count += track.getLength();
+         }
+     }
+     return count; 
+} 
+
+public long countMusicians() {
+     long count = 0;
+     for (Album album : albums) {
+         count += album.getMusicianList().size();
+     }
+     return count;
+} 
+
+public long countTracks() {
+     long count = 0;
+     for (Album album : albums) {
+         count += album.getTrackList().size();
+     }
+     return count; 
+}
+
+  直接将上述命令式 的代码翻译成使用流的形式:
+例:　使用流重构命令式的 Order 类 
+public long countRunningTime() {
+     return albums.stream()
+             .mapToLong(album -> album.getTracks()
+                                      .mapToLong(track -> track.getLength())
+                                      .sum())
+             .sum(); 
+} 
+
+public long countMusicians() {
+     return albums.stream()
+             .mapToLong(album -> album.getMusicians().count())
+             .sum(); 
+} 
+
+public long countTracks() {
+     return albums.stream()
+             .mapToLong(album -> album.getTracks().count())
+             .sum(); 
+}
+  在实现直接面对客户的代码时，比如 countTracks，传入一个代表了领域知识 的 Lambda 表达式。在下例中，就是将专辑映射为上面的曲目。
+例:  使用领域方法重构 Order 类 
+public long countFeature(ToLongFunction<Album> function) {
+     return albums.stream()
+             .mapToLong(function)
+             .sum(); 
+} 
+
+public long countTracks() {
+     return countFeature(album -> album.getTracks().count()); 
+}
+
+public long countRunningTime() {
+     return countFeature(album -> album.getTracks()
+                                       .mapToLong(track -> track.getLength())
+                                       .sum()); 
+}
+
+public long countMusicians() {
+     return countFeature(album -> album.getMusicians().count()); 
+}
+ 
+
+	2.Lambda表达式的单元测试
+  单元测试是测试一段代码的行为是否符合预期的方式。Lambda 表达式给单元测试带来了一些麻烦，Lambda 表达式没有名字，无法直接在测
+试代码中调用。
+  解决该问题有两种方式。第一种是将 Lambda 表达式放入一个方法测试，这种方式要测那 个方法，而不是 Lambda 表达式本身
+例:  将字符串转换为大写形式 
+public static List<String> allToUpperCase(List<String> words) {
+     return words.stream()
+                 .map(string -> string.toUpperCase())
+                 .collect(Collectors.<String>toList()); 
+}
+例:  　测试大写转换 
+@Test 
+public void multipleWordsToUppercase() {
+     List<String> input = Arrays.asList("a", "b", "hello");
+     List<String> result = Testing.allToUpperCase(input);
+     assertEquals(asList("A", "B", "HELLO"), result); 
+}
+  把字符串的第一个字母 转换成大写，其他部分保持不变。使用流和 Lambda 表达式
+例:  将列表中元素的第一个字母转换成大写 
+public static List<String> elementFirstToUpperCaseLambdas(List<String> words) {
+     return words.stream()
+             .map(value -> { 
+                 char firstChar = Character.toUpperCase(value.charAt(0));
+                 return firstChar + value.substring(1);
+             })
+             .collect(Collectors.<String>toList()); 
+}
+例:  测试字符串包含两个字符的情况，第一个字母被转换为大写 
+@Test 
+public void twoLetterStringConvertedToUppercaseLambdas() {
+     List<String> input = Arrays.asList("ab");
+     List<String> result = Testing.elementFirstToUpperCaseLambdas(input);
+     assertEquals(asList("Ab"), result); 
+}
+****用方法引用做测试。任何 Lambda 表达式都能被改写为普通方法，然后使用方法引用直接引用****
+例:　将首字母转换为大写，应用到所有列表元素 
+public static List<String> elementFirstToUppercase(List<String> words) {
+     return words.stream()
+                 .map(Testing::firstToUppercase)
+                 .collect(Collectors.<String>toList()); 
+} 
+ 
+public static String firstToUppercase(String value) { n
+     char firstChar = Character.toUpperCase(value.charAt(0));
+     return firstChar + value.substring(1); 
+}
+  把处理字符串的的逻辑抽取成一个方法后，就可以测试该方法，把所有的边界情况都覆盖到。
+例:　测试单独的方法 
+@Test 
+public void twoLetterStringConvertedToUppercase() {
+     String input = "ab";
+     String result = Testing.firstToUppercase(input);
+     assertEquals("Ab", result); 
+}
+
+	3.在测试替身时使用Lambda表达式
+  测试替身也常被称为模拟，事实上测试存根和模拟都属于测试替身。区别是模 拟可以验证代码的行为。
+  测试代码时，使用 Lambda 表达式的最简单方式是实现轻量级的测试存根
+例:  使用 Lambda 表达式编写测试替身，传给 countFeature 方法 
+@Test 
+public void canCountFeatures() {
+     OrderDomain order = new OrderDomain(asList(
+             newAlbum("Exile on Main St."),
+             newAlbum("Beggars Banquet"),
+             newAlbum("Aftermath"),
+             newAlbum("Let it Bleed"))); 
+ 
+    assertEquals(8, order.countFeature(album -> 2)); 
+}
+  对于 countFeature 方法的期望行为是为传入的专辑返回某个数值。这里传入 4 张专辑，测试存根中为每张专辑返回 2，然后断言该方法
+返回 8，即 2×4。如果要向代码传入一个 Lambda 表达式，最好确保 Lambda 表达式也通过测试。
+例:  结合 Mockito 框架使用 Lambda 表达式 
+List<String> list = mock(List.class); 
+ 
+when(list.size()).thenAnswer(inv -> otherList.size()); 
+ 
+assertEquals(3, list.size());
+  Mockito 使用 Answer 接口允许用户提供其他行为，换句话说，代码即数据。之所以在这里能使用 Lambda 表达式，是因为 Answer 本身
+就是一个函数接口。
+
+
+	4.惰性求值和调试
+  使用流时，调试可能会变得更加复杂， 因为迭代已交由类库控制，而且很多流操作是惰性求值的。在 Java 8 中，你仍然可以使用 IDE 
+提供的各种调试工具，但有时需要调整实现方式，以期达到更好的结果。
+
+	5.日志和打印消息
+  这在流中很难看到每一步操作的结果是什么，因为一些中间步骤是惰性求值的。
+  找出专辑上每位艺术家来自哪个国家:
+例:　记录中间值，以便调试 for 循环 
+Set<String> nationalities = new HashSet<>();
+ for (Artist artist : album.getMusicianList()) {
+     if (artist.getName().startsWith("The")) {
+         String nationality = artist.getNationality();
+         System.out.println("Found nationality: " + nationality);
+         nationalities.add(nationality);
+    } 
+} 
+return nationalities;
+  可以使用 forEach 方法打印出流中的值，这同时会触发求值过程。缺点：无法再继续操作流了，流只能使用一次。如果还想继续，必须重新
+创建流。
+例:　使用 forEach 记录中间值 
+album.getMusicians()
+     .filter(artist -> artist.getName().startsWith("The")) 
+     .map(artist -> artist.getNationality()) 
+     .forEach(nationality -> System.out.println("Found: " + nationality)); 
+ 
+Set<String> nationalities
+     = album.getMusicians()
+            .filter(artist -> artist.getName().startsWith("The"))
+            .map(artist -> artist.getNationality())
+            .collect(Collectors.<String>toSet());
+  流有一个方法让你能查看每个值，同时能继续操作流。这就是 peek 方法
+例:  使用 peek 方法记录中间值 
+Set<String> nationalities
+     = album.getMusicians()
+            .filter(artist -> artist.getName().startsWith("The"))
+            .map(artist -> artist.getNationality())
+            .peek(nation -> System.out.println("Found nationality: " + nation))
+            .collect(Collectors.<String>toSet());
+  使用 peek 方法还能以同样的方式，将输出定向到现有的日志系统中，比如 log4j、java. util.logging 或者 slf4j
+
+	6.在流中间设置断点
+  为了像调试循环那样一步一步跟踪，可在 peek 方法中加入断点，这样就能逐个调试流中的元素了。peek 方法可知包含一个空的方法体，只
+要能设置断点就行。有一些调试器不允许在空的方法体中设置断点，此时，我将值简单地映射为其本身，这样就有地方设置断点了。
+
+
+	7.要点回顾
+  重构遗留代码时考虑如何使用 Lambda 表达式，有一些通用的模式。
+  如果想要对复杂一点的 Lambda 表达式编写单元测试，将其抽取成一个常规的方法。
+  peek 方法能记录中间值，在调试时非常有用。
+
+
+
+*****************************************************************************************************************************
+*****************************************************************************************************************************
+
+
+					第八章   设计和架构的原则
+
+		***********
+		软件开发最重要的设计工具不是什么技术，而是一颗在设计原则方面训练有素的头脑。 
+										***********  
+  本章将探索如何使用 Lambda 表达式实现 SOLID 原则，该原则是开发良好面向对象程序的准则
+  The Single Responsibility Principle (单一责任原则)
+当需要修改某个类的时候原因有且只有一个。换句话说就是让一个类只做一种类型责任，当这个类需要承当其他类型的责任的时候，就需要分
+解这个类。 
+  The Open Closed Principle (开放封闭原则) 
+软件实体应该是可扩展，而不可修改的。也就是说，对扩展是开放的，而对修改是封闭的。
+  The Liskov Substitution Principle(里氏替换原则)
+当一个子类的实例应该能够替换任何其超类的实例时，它们之间才具有is-A关系 
+  The Dependency Inversion Principle(依赖倒置原则)
+1) 高层模块不应该依赖于低层模块，二者都应该依赖于抽象 
+2) 抽象不应该依赖于细节，细节应该依赖于抽象 
+  The Interface Segregation Principle(接口分离原则) 
+不能强迫用户去依赖那些他们不使用的接口。换句话说，使用多个专门的接口比使用单一的总接口总要好。 
+
+
+	1.　Lambda表达式改变了设计模式
+(1)　命令者模式  
+  命令者是一个对象，它封装了调用另一个方法的所有细节，命令者模式使用该对象，可以 编写出根据运行期条件，顺序调用方法的一般化
+代码。该模式包含四个类:命令接收着(执行实际任务)   命令者(封装了所有调用命令执行者的信息)
+		       发起者(控制一个或多个命令的顺序和执行)  客户端(创建具体的命令者实例)
+  有一个 GUI Editor 组件，在上面可以执行 open、save 等一系列操作，如下例。现在我们想实现宏功能:可以将一系列操作录制下来，日后
+作为一个操作执行，这就是命令接收者。
+例:  文本编辑器可能具有的一般功能
+ public interface Editor { 
+ 
+    public void save(); 
+ 
+    public void open(); 
+ 
+    public void close(); 
+ 
+}
+  open、save 这样的操作称为命令，我们需要一个统一的接口来概括这些不同的操作，这个接口叫作 Action，它代表了一个操作。所有的命令
+都要实现该接口 
+例:　所有操作均实现 Action 接口 
+public interface Action { 
+ 
+    public void perform(); 
+ 
+}
+  在 Action 接口中调用 Editor 类中的一个方法。
+例:　保存操作代理给 Editor 方法
+public class Save implements Action { 
+ 
+    private final Editor editor; 
+ 
+    public Save(Editor editor) {
+        this.editor = editor;
+     } 
+ 
+    @Override     
+public void perform() {
+         editor.save();
+     } 
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+  
+ 
+ 
+ 
+
+ 
+
+
+
