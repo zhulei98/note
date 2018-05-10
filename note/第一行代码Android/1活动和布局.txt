@@ -1,0 +1,196 @@
+
+
+				第一章     第一行Android代码
+
+
+	1. 创建第一个Android项目
+  Application name表示应用名称;
+  CompanyDomain表示公司域名;
+  Package name表示项目的包名, Android系统就是通过包名来区分不同应用程序的,因此包名一定要具有唯一性。
+  Projectlocation表示项目代码存放的位置;
+（1）直接选择 Empty Activity 来创建一个空的活动。
+  ActivityName表示活动的名字;   LayOutName表示布局的名字
+（2）启动模拟器
+（3）运行HelloWorld
+
+
+	2. 分析第一个Android项目
+  可以将项目结构模式切换成 Project, 这是项目真实的目录结构
+（1）gradle和.idea，这两个目录下放置的都是 Android Studio自动生成的一些文件
+（2）app 项目中的代码、资源等内容几乎都是放置在这个目录下的,后面的开发工作也基本都是在这个目录下
+（3）build 主要包含了一些在编译时自动生成的文件
+（4）grandle 包含了 gradle wrapper的配置文件
+（5）gitignore  用来将指定的目录或文件排除在版本控制之外
+（6）build.gradle 项目全局的gradle构建脚本, 通常这个文件中的内容是不需要修改的
+（7）gradle.properties 这个文件是全局的gradle配置文件,在这里配置的属性将会影响到项目中所有的 gradle编译脚本
+（8）gradlew和gradlew.bat 这两个文件是用来在命令行界面中执行gradle命令的, 其中. gradlew是在 Linux或 Mac系统使用的, gradlew.bat
+是在windows系统中使用的
+（9）HelloWorld.iml iml文件是所有 Inte11iJ IDEA项目都会自动生成的一个文件，用于标识这是一个 IntelliJ IDEA项目
+（10）local.properties 这个文件用于指定本机中的Android SDK路径,通常内容都是自动生成的
+（11）settings.gradle 这个文件用于指定项目中所有引入的模块
+
+  对APP目录进行详细分析
+（1）build 这个目录和外层的 build目录类似, 主要也是包含了一些在编译时自动生成的文件, 不过它里面的内容会更多更杂
+（2）libs 如果你的项日中使用到了第三方 jar 包, 就需要把这些 jar 包都放在1ibs目录下, 放在这个目录下的 jar包都会被自动添加到构建
+路径里去
+（3）AndroidTest 此处是用来编写 Android Test测试用例的, 可以对项目进行一些自动化测试
+（4）java java目录是放置所有 Java代码的地方
+（5）res 项目中使用到的所有图片、布局、字符串等资源都要存放在这个目录下。图片放在drawable日录下；布局放在1ayout目录下；字符串
+放在values目录下	
+（6） AndroidManifest.xml 这是整个Android项目的配置文件，在程序中定义的所有四大组件都要在 这个文件里注册，另外还可以在这个文件
+中给应用程序添加权限声明 
+（7）test 用来编写 unit Test测试用例, 是对项目进行自动化测试的另一种方式
+（8）gitignore 用于将app模块内的指定的目录或文件排除在版本控制之外
+（9）app.iml InteniJ IDEA项目自动生成的文件, 我们不需要关心或修改这个文件中的内容
+（10）build.gradle 是app模块的 gradle构建脚本,这个文件中会指定很多项目构建相关的配置
+（11）proguard-rules.pro 这个文件用于指定项目代码的混淆规则,当代码开发完成后打成安装包文件,如果不希望代码被别人破解,通常会将
+代码进行混淆,从而让破解者难以阅读
+
+  对HelloWorld分析
+He11oWorldActivity, 代码如下所示:
+pubiic class HelloWorLdActivity extends AppCompatActivity{
+	@0verride
+	protected void onCreate(BundlLe savedInstanceState) {
+	super. onCreate(savedInstanceState) ;
+	setContentView(R.layout.he11Lo_world_Layout);
+}
+  Activity 是 Android系统提供的一个活动基类,我们项目中所有的活动都必须继承它或者它的子类才能拥有活动的特性( AppCompatActivity 
+是 Activity的子类)。oncreate( )方法是一个活动被创建时必定要执行的方法。
+***** Android程序的设计讲究逻辑和视图分离*****
+  不推荐在活动中直接编写界面的,更加通用的一种做法是,在布局文件中编写界面,然后在活动中引入进来。setContentView( )方法给当前的
+活动引入了一个hello_world_1ayout布局。
+  布局文件都是定义在 res/1ayout目录下的，展开目录切换到text view，看到代码如下：
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.zhulei.helloworld.MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!" />
+</RelativeLayout>
+  其中TextView是Android系统提供的一个控件，用于在布局中显示文字
+
+	3. 详解项目中的资源
+（1）所有以drawable开头的文件夹都是用来放图片的
+（2）所有以 mipmap开头的文件夹都是用来放应用图标的
+（3）所有values开头的文件夹都是用来放字符中、样式、颜色等配置的
+（5）layout文件夹是用来放布局文件的
+  打开 res/values/strings.xm1文件, 内容如下所示:
+<resources>
+    <string name="app_name">HelloWorld</string>
+</resources>
+  这里定义了一个应用程序名的字符串, 我们有以下两种方式来引用它
+（1）在代码中通过 R. string. heuo_world可以获得该字符串的引用。
+（2）在 XML中通过@string/helLo_world可以获得该字符串的引用。
+
+	4. 详解 build.gradle文件
+  Android Studio是采用 Gradle来构建项目，gradle使用了一种基于 Groovy的领域特定语言(DSL)来声明项目设置,摒弃了传统基于 XML(如
+ Ant和 Maven)的各种烦琐配置。
+
+  HelloWorld项目中有两个 build.gradle文件，先来看一下最外层日录下的 buildgradle文件：
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.0.0'
+
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+  jcenter是一个代码托管仓库,很多 Android开源项日都会选择将代码托管到 jcenter上, 声明了这行配置之后, 就可以在项目中轻松引用任
+何 jcenter上的开源项目了。
+  Gradle并不是专门为构建 Android项目而开发的, Java、 C++等很多种项目都可以使用 Gradle来构建。因此如果我们要想使用它来构建 
+Android项目,则需要声明 com.android.tooLs. builLd:gradle: 2 .0.0这个插件 
+  通常情况下并不需要修改这个最外层目录下的 build.gradle文件，除非你想添加一些全局的项目构建配置。
+
+  下面再来看一下 app目录下的 build.gradle文件,代码如下所示:
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23			//指定项目的编译版本
+    buildToolsVersion "27.0.3"			//指定项目构建工具的版本
+
+    defaultConfig {
+        applicationId "com.zhulei.helloworld"   //指定项目的包名
+        minSdkVersion 21			//指定项目最低兼容的Android系统版本
+        targetSdkVersion 23
+        versionCode 1				//指定项目的版本号
+        versionName "1.0"			//指定项目的版本名
+    }
+    buildTypes {
+        release {
+            minifyEnabled false			//指定是否对项目代码进行混淆
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {					//指定当前项目所有的依赖关系
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+}
+  第一行com.android.application 表示这是一个应用程序模块；还可选为com.android. Library，表示这是一个库模块。应用程序模块和库
+模块的最大区别在于, 一个是可以直接运行的，一个只能作为代码库依附于别的应用程序模块运行。
+  通常Android Studio项日一共有3种依赖方式: 本地依赖、 库依赖和远程依赖。 本地依赖可以对本地的 Jar包或日录添加依赖关系, 库依
+赖可以对项日中的库模块添加依赖关系, 远程依赖则可以对 jcenter库上的开源项目添加依赖关系。 
+  compile fileTree就是一个本地依赖声明,它表示将1ibs目录下所有jar后缀的文件都添加到项日的构建路径当中。 
+  compile则是远程依赖声明, com.android.support:appcompat-v7:23.4.0就是一个标准的远程依赖库格式。
+
+	5. 使用Android的日志工具Log
+  Android中的日志工具类是 Log( android.uti1.Log),这个类中提供了如下5个方法来供我们打印日志。
+（1）Log.v( ) 。用于打印那些最为琐碎的、意义最小的日志信息。对应级别 verbose,是 Android日志里面级别最低的一种 
+（2）Log.d( ) 。用于打印一些调试信息，对应级别 debug, 比 verbose高一级。
+（3）Log.i( ) 。用于打印一些比较重要的数据,对应级别 info,比debug高一级。
+（4）Log.w( ) 。用于打印一些警告信息,对应级别 warn,比info高一级。
+（5）Log.e()。用于打印程序中的错误信息,对应级别 error,比 warn高一级。
+
+
+*****************************************************************************************************************************
+*****************************************************************************************************************************
+
+				第二章    探究活动
+	1.活动的基本用法
+  活动(Activity)是一种可以包含用户界面的组件,主要用于和用户进行交互 。
+（1） 手动创建活动
+  项目创建成功后右击 com.example.activitytest包→New→Activity→Empty Activity ，将活动命名为 FirstActivity ,并且不要勾选 
+Generate Layout File和 Launcher Activity
+代码如下：
+package com.example.activitytest;
+
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+
+public class FirstActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+}
+（2）创建和加载布局
+  Android程序的设计讲究逻辑和视图分离, 最好每一个活动都能对应一个布局, 布局就是用来显示界面内容的。
+  右击 app/src/main/res目录→New→Directory,会弹出一个新建日录的窗口,这里先创建一个名为1ayout的目录。然后对着1ayout目录右键→
+Layoutresource file,又会弹出一个新建布局资源文件的窗口,将这个布局文件命名为 first_1ayout,根元素就默认选择为 LinearLayout。
