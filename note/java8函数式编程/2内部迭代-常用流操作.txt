@@ -1,0 +1,241 @@
+	3.常用的流操作
+  (1)collect(toList()) 方法由 Stream 里的值生成一个列表，是一个及早求值操作。
+例:  List<String> collected = Stream.of("a", "b", "c")  
+                                    .collect(Collectors.toList());  
+     assertEquals(Arrays.asList("a", "b", "c"), collected);  
+  使用 collect(toList()) 方法从 Stream 中生成一个列表.。首先由列表生成一个 Stream ，
+然后 进行一些 Stream 上的操作，继而是 collect 操作，由 Stream 生成列表，最后使用断言 判断结果是否和预期一致
+ 
+  (2)map  如果有一个函数可以将一种类型的值转换成另外一种类型，map 操作就可以使用该函数，
+     将一个流中的值转换成一个新的流。
+例: 使用 for 循环将字符串转换为大写
+  List<String> collected = new ArrayList<>(); 
+  for (String string : asList("a", "b", "hello")) {     
+       String uppercaseString = string.toUpperCase();     
+       collected.add(uppercaseString); 
+}  
+assertEquals(asList("A", "B", "HELLO"), collected);
+  在一个循环中，对每个字符串调用 toUppercase 方法，然后将得到的结果加入一个新的列表
+    　使用 map 操作将字符串转换为大写形式 
+  List<String> collected = Stream.of("a", "b", "hello")                                
+   			.map(string -> string.toUpperCase())                                 
+			.collect(toList()); 
+  assertEquals(asList("A", "B", "HELLO"), collected);
+  (3)遍历数据并检查其中的元素时，可尝试使用 Stream 中提供的新方法 filter 
+例:  　使用循环遍历列表，使用条件语句做判断 
+  List<String> beginningWithNumbers = new ArrayList<>(); 
+  for(String value : asList("a", "1abc", "abc1")) {    
+       if (isDigit(value.charAt(0))) {        
+           beginningWithNumbers.add(value);    
+       } 
+} 
+assertEquals(asList("1abc"), beginningWithNumbers);
+       　函数式风格
+  List<String> beginningWithNumbers
+   = Stream.of("a", "1abc", "abc1")           
+  	   .filter(value -> isDigit(value.charAt(0)))           
+           .collect(toList()); 
+assertEquals(asList("1abc"), beginningWithNumbers);
+  (4)flatmap  flatMap 方法可用 Stream 替换值，然后将多个 Stream 连接成一个 Stream
+有时，用户希望让 map 操作有点变化，生成一个新的 Stream 对象取而代之。用户通常不希望结果是一连串的流，
+此时 flatMap 最能派上用场。
+例:  包含多个列表的 Stream 
+  List<Integer> together = Stream.of(asList(1, 2), asList(3, 4))
+                               .flatMap(numbers -> numbers.stream())
+                               .collect(toList()); 
+  assertEquals(asList(1, 2, 3, 4), together);
+  调用 stream 方法，将每个列表转换成 Stream 对象，其余部分由 flatMap 方法处理。 flatMap 方法的相关函数接口
+和 map 方法的一样，都是 Function 接口，只是方法的返回值 限定为 Stream 类型罢了。
+  (5)　max和min 求最大值和最小值。
+例:  使用 Stream 查找最短曲目 
+List<Track> tracks = asList(new Track("Bakai", 524),                             
+			    new Track("Violets for Your Furs", 378),
+                            new Track("Time Was", 451)); 
+ 
+Track shortestTrack = tracks.stream()
+                            .min(Comparator.comparing(track -> track.getLength()))
+                            .get(); 
+ 
+assertEquals(tracks.get(1), shortestTrack);
+  查找 Stream 中的最大或最小元素，首先要考虑的是用什么作为排序的指标。以查找专辑中 的最短曲目为例，
+排序的指标就是曲目的长度。放在以前，我们 需要比较两个对象的某项属性的值，现在只需要提供一个存取方法就够了。
+本例中使用 getLength 方法。  可以调用空 Stream 的 max 方法，返回 Optional 对象。Optional 代表一个可能存在
+也可能不存在的值。如果 Stream 为空，那么该值不存在，如果不为空，则该值存在。
+  (6)通用模式  max 和 min 方法都属于更通用的一种编程模式。要看到这种编程模式，最简单的方法是使用 for 循环
+重写代码
+例:  　使用 for 循环查找最短曲目 
+List<Track> tracks = asList(new Track("Bakai", 524),
+                            new Track("Violets for Your Furs", 378),
+                            new Track("Time Was", 451)); 
+ 
+Track shortestTrack = tracks.get(0);
+for (Track track : tracks) {
+     if (track.getLength() < shortestTrack.getLength()) {
+         shortestTrack = track;
+     } 
+} 
+ 
+assertEquals(tracks.get(1), shortestTrack);
+  先使用列表中的第一个元素初始化变量 shortestTrack，然后遍历曲目列表，如果找到更短的曲目，则更新shortestTrack，
+最后变量 shortestTrack 保存的正是最短曲目。 
+例: 　reduce 模式
+Object accumulator = initialValue;
+for(Object element : collection) {  
+    accumulator = combine(accumulator, element);
+}
+  两个可变项是 initialValue 初始值和 combine 函数,在循环体中，通过调用 combine 函数，拿 accumulator 和集合中
+的每一个元素做运算，再将运算结果赋给 accumulator，最后 accumulator 的值就是想要的结果。
+  (7)reduce.   reduce 操作可以实现从一组值中生成一个值。在上述例子中用到的 count、min 和 max 方 法，因为常用
+而被纳入标准库中。事实上，这些方法都是 reduce 操作。
+例:  使用 reduce 求和 
+int count = Stream.of(1, 2, 3)
+		  .reduce(0, (acc, element) -> acc + element); 
+ 
+assertEquals(6, count);
+  Lambda 表达式的返回值是最新的 acc，是上一轮 acc 的值和当前元素相加的结果。Lambda 表达式就是 reducer，它执行
+求和操作，有两个 参数：传入 Stream 中的当前元素和 acc。将两个参数相加，acc 是累加器，保存着当前的 累加结果。
+例:展开 reduce 操作 
+BinaryOperator<Integer> accumulator = (acc, element) -> acc + element; 
+int count = accumulator.apply(
+                 accumulator.apply(
+                     accumulator.apply(0, 1),
+                 2),
+             3);
+reducer 的类型BinaryOperator。
+例:  　使用命令式编程方式求和 
+int acc = 0;
+for (Integer element : asList(1, 2, 3)) {
+     acc = acc + element;
+} 
+assertEquals(6, acc);
+  在命令式编程方式下，每一次循环将集合中的元素和累加器相加，用相加后的结果更新累 加器的值。对于集合来说，循环在
+外部，且需要手动更新变量        命令式编程和函数式编程的区别??
+  (8)整合操作  
+例:     找出某张专辑上所有乐队的国籍
+将问题分解为四个步骤	
+	1). 找出专辑上的所有表演者: 
+		Album 类有个 getMusicians 方法，该方法返回一个 Stream 对象，包含整张专辑中所有的 表演者；
+ 	2). 分辨出哪些表演者是乐队:
+		使用 filter 方法对表演者进行过滤，只保留乐队； 
+ 	3). 找出每个乐队的国籍:
+		使用 map 方法将乐队映射为其所属国家；
+ 	4). 将找出的国籍放入一个集合:
+		使用 collect(Collectors.toList()) 方法将国籍放入一个列表。
+  最后，整合所有的操作，就得到如下代码：
+Set<String> origins = album.getMusicians()
+                           .filter(artist -> artist.getName().startsWith("The"))
+                           .map(artist -> artist.getNationality())
+                           .collect(toSet());
+  处理其他实际遇到的问题时很可能没有方法可以返回一个 Stream 对象，反而得到像 List 或 Set 这样的集合类。此时只要
+调用 List 或 Set 的 stream 方法就能得到一个 Stream 对象。但有时不一定需要对外暴露一个list或set对象,可能一个Stream 
+工厂才是更好的选择。
+  通过 Stream 暴露集合的最大优点在于，它很好地封装了内 部实现的数据结构。仅暴露一个 Stream 接口，用户在实际操作中
+无论如何使用，都不会影响内部的 List 或 Set。
+
+
+
+	4. 重构遗留代码.
+例:　遗留代码：找出长度大于 1 分钟的曲目 
+   首先 初始化一个 Set 对象，用来保存找到的曲目名称。
+   然后使用 for 循环遍历所有专辑，每次循环中再使用一个 for 循环遍历每张专辑上的每首曲目，检查其长度是否大于 60 秒，
+如果是，则将该曲目名称加入 Set 对象。
+public Set<String> findLongTracks(List<Album> albums) {
+     Set<String> trackNames = new HashSet<>();
+     for(Album album : albums) {
+         for (Track track : album.getTrackList()) {
+             if (track.getLength() > 60) {
+                 String name = track.getName();
+                 trackNames.add(name);
+             }
+         }
+     }
+     return trackNames;
+}
+  重构代码:
+public Set<String> findLongTracks(List<Album> albums) { 
+     return albums.stream()
+                  .flatMap(album -> album.getTracks())
+                  .filter(track -> track.getLength() > 60)
+                  .map(track -> track.getName())
+                  .collect(toSet());
+ }
+  编写示例代码的每一步都要进行单元测试， 保证代码能够正常工作。重构遗留代码时，这样做很有帮助。
+
+
+	5.　多次调用流操作.
+最好不要选择每一步强制对函数求值,缺点如下:
+	代码可读性差，样板代码太多，隐藏了真正的业务逻辑；
+ 	效率差，每一步都要对流及早求值，生成新的集合；
+	代码充斥一堆垃圾变量，它们只用来保存中间结果，除此之外毫无用处；
+ 	难于自动并行化处理.
+例:　误用 Stream 的例子 
+List<Artist> musicians = album.getMusicians()
+                              .collect(toList()); 
+ 
+List<Artist> bands = musicians.stream()
+                              .filter(artist -> artist.getName().startsWith("The"))                               
+		              .collect(toList()); 
+ 
+Set<String> origins = bands.stream()
+                           .map(artist -> artist.getNationality())
+                           .collect(toSet());
+  符合 Stream 使用习惯的链式调用
+Set<String> origins = album.getMusicians()
+                           .filter(artist -> artist.getName().startsWith("The"))
+                           .map(artist -> artist.getNationality())  
+                           .collect(toSet());
+
+
+	6.高阶函数.
+  高阶函数是指接受另外一个函 数作为参数，或返回一个函数的函数。map 是一个高阶函数，因为它的 mapper 参数是一个函数。
+事实上，本章介绍的 Stream 接口中几乎所有的函数都是高阶函数。
+
+
+	7.正确使用Lambda表达式.
+  使用时，要明确达成什么转化，而不是说明如何转化。这种方式写出的代码，潜在的缺陷更少，更直接地表达了程序员的意图。
+明确要达成什么转化，而不是说明如何转化的另外一层含义在于写出的函数没有副作用。 这一点非常重要，这样只通过函数的
+返回值就能充分理解函数的全部作用。
+  没有副作用的函数不会改变程序或外界的状态。
+例:  ActionEvent localEvent = null;
+     button.addActionListener(event -> {     
+         localEvent = event;
+});
+这段代码试图将 event 赋给一个局部变量，它无法通过编译，但绝非编写错误。这实际上 是语言的设计者有意为之，用以鼓励
+用户使用 Lambda 表达式获取值而不是变量。    ***获取值使用户更容易写出没有副作用的代码***??
+
+
+	8.要点回顾
+内部迭代将更多控制权交给了集合类。
+和 Iterator 类似，Stream 是一种内部迭代方式。 
+将 Lambda 表达式和 Stream 上的方法结合起来，可以完成很多常见的集合操作。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
