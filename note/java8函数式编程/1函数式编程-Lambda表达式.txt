@@ -1,0 +1,126 @@
+		第一章
+
+	1.函数式编程,其核心是：在思考问题时，使用不可变值和函数，函数对一个值进行处理，映射成另一个值。
+
+
+		第二章 Lambda表达式
+
+	1.Lambda表达式.
+
+  “Lambda 表达式”(lambda expression)是一个匿名函数，Lambda表达式基于数学中的λ演算得名，
+直接对应于其中的lambda抽象(lambda abstraction)，是一个匿名函数，即没有函数名的函数。
+Lambda表达式可以表示闭包（注意和数学传统意义上的不同）。
+
+例:不采用Lambda的老方法：
+
+Runnable runnable1=new Runnable(){
+public void run(){
+System.out.println("RunningwithoutLambda");
+}
+};
+
+使用Lambda：
+
+Runnable runnable2=()->{
+System.out.println("RunningfromLambda");
+};
+
+使用Lambda表达式不仅让代码变的简单、而且可读、最重要的是代码量也随之减少很多。
+
+
+	2.引用值，而不是变量
+
+  使用过匿名内部类,需要引用它所在方法里的变量。这时，需要将变量声明为final,将变量声明为 final，
+意味着不能为其重复赋值。同时也意味着在使用 final 变量时，实际上是在使用赋给该变量的一个特定的值。
+
+既成事实上的 final 是指只能给该变量赋值一次。换句话说，Lambda 表达式引用的是值， 而不是变量
+
+例:　Lambda 表达式中引用既成事实上的 final 变量 
+String name = getUserName(); 
+button.addActionListener(event -> System.out.println("hi " + name));
+     未使用既成事实上的 final 变量，导致无法通过编译 
+String name = getUserName(); 
+name = formatUserName(name); 
+button.addActionListener(event -> System.out.println("hi " + name));
+
+如果你试图给该变量多次赋值，然后在 Lambda 表达式中引用它，编译器就会报错。
+这种行为也解释了为什么 Lambda 表达式也被称为闭包。未赋值的变量与周边环境隔离起 来，进而被绑定到一个特定的值
+
+注 ： Lambda 表达式中引用的局部变量必须是 final 或既成事实上的 final 变量。
+
+
+	3.函数接口.
+
+  函数接口是只有一个抽象方法的接口，用作 Lambda 表达式的类型。
+例:  ActionListener 接口：接受 ActionEvent 类型的参数，返回空 
+public interface ActionListener extends EventListener { 
+    public void actionPerformed(ActionEvent event);
+ }
+
+
+	4.类型推断.
+  Java 7 中程序员可省略构造函数的泛型类型，Java 8 更进一步，程序员可省略 Lambda 表达 式中的所有参数类型。
+javac 根据 Lambda 表达式上下文信息 就能推断出参数的正确类型。程序依然要经过类型检查来保证运行的安全性，
+但不用再显式声明类型罢了。这就是所谓的类型推断。
+
+例:  类型推断
+ Predicate<Integer> atLeast5 = x -> x > 5;
+
+　Predicate 接口的源码，接受一个对象，返回一个布尔值 
+public interface Predicate<T> {     
+boolean test(T t); 
+}
+
+
+	5.要点回顾
+  Lambda 表达式是一个匿名方法，将行为像数据一样进行传递
+  Lambda 表达式的常见结构： BinaryOperator<Integer> add = (x, y) → x + y 
+  函数接口指仅具有单个抽象方法的接口，用来表示 Lambda 表达式的类型
+
+
+		第三章 从外部迭代到内部迭代
+	1.外部迭代
+
+例：使用 for 循环计算来自伦敦的艺术家人数
+count = 0;
+(Artist artist : allArtists) {
+(artist.isFrom("London")) {
+count++;
+}
+}
+就其背后的原理来看， for 循环其实是一个封装了迭代的语法糖
+
+  使用迭代器计算来自伦敦的艺术家人数
+count = 0;
+Iterator<Artist> iterator = allArtists.iterator();
+(iterator.hasNext()) {
+Artist artist = iterator.next();
+(artist.isFrom("London")) {
+count++;
+}
+}
+  工作原理：首先调用 iterator 方法，产生一个新的 Iterator 对象，进而控制整
+个迭代过程，这就是外部迭代。迭代过程通过显式调用 Iterator 对象的 hasNext 和 next
+方法完成迭代。   ??
+
+外部迭代也有问题。首先，它很难抽象出本章稍后提及的不同操作；此外，它从本
+质上来讲是一种串行化操作。总体来看，使用 for 循环会将行为和方法混为一谈。
+
+	
+
+	2.内部迭代
+  内部迭代:首先要注意 stream() 方法的调用，它和上例中调用 iterator() 的作用一样。
+该方法不是返回一个控制迭代的 Iterator 对象，而是返回内部迭代中的相应接口： Stream 。
+
+例 　使用内部迭代计算来自伦敦的艺术家人数
+count = allArtists.stream()
+		  .filter(artist -> artist.isFrom("London"))   //对对象进行过滤
+		  .count();				       //计算给定 Stream 里包含多少个对象
+  Stream 是用函数式编程方式在集合类上进行复杂操作的工具。Stream 里的一些方法却略有不同，
+它们虽是普通的 Java 方法，但返回的 Stream 对象却不是一个新集合，而是创建新集合的配方。??
+
+  像 filter 这样只描述 Stream，最终不产生新集合的方法叫作惰性求值方法；
+而像 count 这样 最终会从 Stream 产生值的方法叫作及早求值方法。
+
+  判断一个操作是惰性求值还是及早求值只需看它的返回值,如果返回值是 Stream， 那么是惰性求值；
+如果返回值是另一个值或为空，那么就是及早求值。
